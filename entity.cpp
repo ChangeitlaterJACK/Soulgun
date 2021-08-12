@@ -1,10 +1,17 @@
-//implementation of the entity class
+/**
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
+ */
 
 #include "entity.h"
 
 using namespace std;
 
-Entity::Entity() :
+/**
+ * Default constructor
+ */
+Entity::Entity(void):
     maxHealth(10),
     health(maxHealth),
     entityType(ET_ROBOT),
@@ -18,12 +25,13 @@ Entity::Entity() :
     moveAway(false)
 
 {
-		setHitbox(ET_ROBOT);
+	setHitbox(ET_ROBOT);
 #ifdef ENTITYDEBUG
     cout << "Created default entity." << endl;
 #endif
 }
 
+// Copy constructor
 Entity::Entity(const Entity &entity) :
     maxHealth(maxHealth),
     health(maxHealth),
@@ -35,16 +43,26 @@ Entity::Entity(const Entity &entity) :
     projectileMove(projectileMove),
     textureID(textureID)
 {
-		setHitbox(entityType);
+	setHitbox(entityType);
 #ifdef ENTITYDEBUG
     cout << "Created entity from copy." << endl;
 #endif
 }
 
-Entity::~Entity(void) {
-    // todo
-}
+// Destructor
+Entity::~Entity(void) { }
 
+/**
+ * Constructor
+ * 
+ * @param health Amount of hit points
+ * @param entityType ET constant: human, robot, player
+ * @param x Current X-coord
+ * @param y Current Y-coord
+ * @param entityMove Function that describes the entity's movemeny
+ * @param projectMove Function that desribes the movement of entity's projectiles
+ * @param textureID Texture identifier
+ */
 Entity::Entity(int health, EntityType entityType,
                 double x, double y, double speed, moveEntityFunc entityMove,
                 moveProjectileFunc projectileMove,
@@ -59,7 +77,7 @@ Entity::Entity(int health, EntityType entityType,
     projectileMove(projectileMove),
     textureID(textureID)
 {
-		setHitbox(entityType);
+	setHitbox(entityType);
 #ifdef ENTITYDEBUG
     cout << "Created entity with custom stats." << endl;
     cout << "Type is: " << (entityType == ET_PLAYER ? "player" : "npc") << endl;
@@ -68,8 +86,12 @@ Entity::Entity(int health, EntityType entityType,
 #endif
 }
 
-
-Position Entity::getPosition()
+/**
+ * Get x, y coordinates
+ * 
+ * @returns struct with x, y members
+ */
+Position Entity::getPosition(void)
 {
     Position pos;
     pos.x = posx;
@@ -77,72 +99,102 @@ Position Entity::getPosition()
     return pos;
 }
 
-int Entity::getHealth()
+/**
+ * Getter for health
+ * 
+ * @returns Current health
+ */
+int Entity::getHealth(void)
 {
     return health;
 }
 
-TextureID Entity::getImage()
+/**
+ * Getter for texture identifier
+ * 
+ * @returns Current texture identifier
+ */
+TextureID Entity::getImage(void)
 {
     return textureID;
 }
 
-EntityType Entity::getType()
+/**
+ * Getter for entity type identifier
+ * 
+ * @returns Entity type identifier
+ */
+EntityType Entity::getType(void)
 {
     return entityType;
 }
 
+/**
+ * Adjusts hitbox based on entity type
+ * 
+ * @param ID entity type identifier
+ */
 void Entity::setHitbox(EntityType ID){
-
-    if(ID == ET_PROJECTILE){
-			hitbox.h = 5;
-			hitbox.w = 5;
-		}
-		else{
-			hitbox.h = 25;
-			hitbox.w = 25;
-		}
-}
-void Entity::setHitboxPos(Position entity){
-
-			hitbox.x = entity.x;
-			hitbox.y = entity.y;
+    if(ID == ET_PROJECTILE)
+    {
+        hitbox.h = 5;
+        hitbox.w = 5;
+    }
+    else
+    {
+        hitbox.h = 25;
+        hitbox.w = 25;
+    }
 }
 
-SDL_Rect * Entity::getHitbox(){
+/**
+ * Adjusts hitbox locatio
+ * 
+ * @param entity Entity's current position
+ */
+void Entity::setHitboxPos(Position entity)
+{
+    hitbox.x = entity.x;
+    hitbox.y = entity.y;
+}
+
+/**
+ * Getter for the hitbox
+ * 
+ * @returns The hitbox struct
+ */
+SDL_Rect * Entity::getHitbox()
+{
 	return &hitbox;
 }
+
+/**
+ * Determines whether an entity collides with a defined box
+ * 
+ * @param a Pointer to an SDL rectangle definition
+ * @returns True if collision detected
+ */
 bool Entity::entityCollision(SDL_Rect * a){
 	return SDL_HasIntersection(a, &this->hitbox);
 }
-/*
-void Entity::move(Movement &dir)
-{
-#ifdef ENTITYDEBUG
-    bool printSecondHalfOfDebug;
-    if (dir.right || dir.left || dir.up || dir.down)  //only print if its going to move
-    {
-        cout << "Moved entity from (" << posx << ", " << posy;
-        printSecondHalfOfDebug = true;
-    }
-#endif
-    Position pos = entityMove(posx, posy, dir, speed);
-    posx = pos.x;
-    posy = pos.y;
 
-    moveDirection = dir;
-#ifdef ENTITYDEBUG
-    if (printSecondHalfOfDebug)
-        cout << ") to (" << posx << ", " << posy << ") \n";
-#endif
-}
-*/
-
+/**
+ * Determines where an entity would be located after moving (without actually moving them)
+ * 
+ * @param dir Movement struct for movement directions
+ * @returns Resulting position
+ */
 Position Entity::testMove(Movement &dir)
 {
     return entityMove(posx, posy, dir, speed);
 }
 
+/**
+ * Inflict damage on the entity
+ * 
+ * @param amount Amount of damage to inflict (makes health go down)
+ * @returns True if entity has no remaining hit points (death)
+ */
 bool Entity::damage(int amount)
 {
     health -= amount;
@@ -157,9 +209,16 @@ bool Entity::damage(int amount)
         return true;
     }
     else
+    {
         return false;
+    }
 }
 
+/**
+ * Sets entity location (x, y coord)
+ * 
+ * @param newPos New x,y position
+ */
 void Entity::setLocation(Position &newPos){
     posx = newPos.x;
     posy = newPos.y;

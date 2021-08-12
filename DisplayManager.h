@@ -1,5 +1,7 @@
 /**
- * Display Manager for Soulgun
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
  */
 
 #pragma once
@@ -11,12 +13,9 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 // Distance enemies will spawn away from the player
 #define SPAWN_DIST 350
 
-
-// Hard-coded until Manager is merged with Map
 #define MAP_WIDTH 1024
 #define MAP_HEIGHT 1024
 
@@ -45,7 +44,7 @@ public:
     void refresh(void);
 
     void flashBox(int startx, int starty, int Width, int Height);
-    void flashScreen();
+    void flashScreen(void);
     bool swapSpots(Humanoid *toSwap);
 
 private:

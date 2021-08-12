@@ -1,35 +1,41 @@
+/**
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
+ */
+
 #ifndef _PROJECTILE_
 #define _PROJECTILE_
 
 #include "entity.h"
 #include "movement.h"
 
-
-class Projectile : public Entity
+/**
+ * Represents a projectile entity type
+ *
+ * Handles movement and attributes specific to projectiles
+ */
+class Projectile: public Entity
 {
 public:
-        Projectile();
-        Projectile(const Projectile &projectile);
-        Projectile(int lifetime, int power, double startx, double starty, double direction, bool soulBullet, moveProjectileFunc projectileMove, TextureID textureID);
+    Projectile();
+    Projectile(const Projectile &projectile);
+    Projectile(int lifetime, int power, double startx, double starty, double direction, bool soulBullet, moveProjectileFunc projectileMove, TextureID textureID);
 
-        void move(Movement &dir); //not the ideal movement but will work
-        Position testMove(Movement &dir);
-        bool move(double thetaAim); //not implemented yet but use these instead with the player location
-        Position testMove(double thetaAim); //these could be changed to accept a Position instead
+    void move(Movement &dir);
+    bool move(double thetaAim); 
+    Position testMove(Movement &dir); 
+    Position testMove(double thetaAim);
+    void changeDirection(double amount); 
 
-        void changeDirection(double amount); //add radians to current direction
-        //designed to be used for ease of multi bullet creation along with the copy constructor
-        //could potentially be used for rebounding off walls, but this is not expected and wont work with all movement functions
-
-        int getPower();
-        double getDirection();
-        bool isSoulBullet(); //returns the value of soulBullet, it is a "getter" function but the word "get" didnt make sense
+    int getPower(void);
+    double getDirection(void);
+    bool isSoulBullet(void);
 protected:
-        int power; //the number of health points the projectile will do upon contact
-        bool soulBullet; //true if the bullet used will take a humans soul
-
-        double startx;
-        double starty;
-        double direction; //radians for the direction the bullet is facing/aimed at
+    int power;
+    bool soulBullet; 
+    double startx;
+    double starty;
+    double direction;
 };
 #endif
