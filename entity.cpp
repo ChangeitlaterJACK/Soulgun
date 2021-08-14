@@ -129,11 +129,21 @@ EntityType Entity::getType(void)
     return entityType;
 }
 
+/**
+ * Getter for the Move Projectile function
+ * 
+ * @returns Move projectile function
+ */
 moveProjectileFunc Entity::getProjMoveFunc()
 {
     return projectileMove;
 }
 
+/**
+ * Setter for the Move Projectile function
+ * 
+ * @param func A moveProjectileFunc function
+ */
 void Entity::setProjMoveFunc(moveProjectileFunc func)
 {
     projectileMove = func;
