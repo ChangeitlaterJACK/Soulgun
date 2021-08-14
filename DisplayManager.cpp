@@ -172,15 +172,16 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
     ShootStyle ss;
 
     moveProjectileFunc projMoveFunc;
-    int theta = (rand() % 628) * 0.01;
+    double theta = (rand() % 628) * 0.01;
 
     // pick a random available location around player to spawn at
     x = pos.x + cos(theta) * SPAWN_DIST;
     y = pos.y + sin(theta) * SPAWN_DIST;
     newPos.x = x;
     newPos.y = y;
-    while (!(map->mapCollision(pos)))
+    while (!(map->mapCollision(newPos)))
     {
+    		theta = (rand() % 628)*0.01;
         x = pos.x + cos(theta) * SPAWN_DIST;
         y = pos.y + sin(theta) * SPAWN_DIST;
         newPos.x = x;
@@ -468,12 +469,11 @@ void DisplayManager::moveProjectiles(Humanoid *player) {
                         removeProjectile(p);
                     }
                 }
-                else if (p->move(thetaAim))
+                else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
                     removeProjectile(p);
             }
         }
-        // Otherwise move the projectile
-        else if (p->move(thetaAim)) 
+      	else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
         {
             removeProjectile(p);
         }
@@ -588,7 +588,8 @@ bool DisplayManager::swapSpots(Humanoid *toSwap)
             Position newPos = toSwap->getPosition();
             entities[0]->setLocation(newPos);
             entities[0]->setHitboxPos(newPos);
-
+            entities[0]->setProjMoveFunc(toSwap->getProjMoveFunc());
+            entities[0]->setShootStyle(toSwap->getShootStyle());
             flashScreen();
             flashBox(newPos.x - 5, newPos.y - 5, newPos.x + 5, newPos.y + 5);
 

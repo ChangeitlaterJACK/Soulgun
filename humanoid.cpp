@@ -56,6 +56,16 @@ Humanoid::Humanoid(int health, EntityType entityType,
 // Destructor
 Humanoid::~Humanoid() { }
 
+ShootStyle Humanoid::getShootStyle()
+{
+    return shootStyle;
+}
+
+void Humanoid::setShootStyle(ShootStyle ss)
+{
+    shootStyle = ss;
+}
+
 /**
  * Move entity location
  * 

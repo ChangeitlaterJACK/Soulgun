@@ -48,9 +48,11 @@ public:
                 int shootCooldown, ShootStyle shootStyle, moveProjectileFunc projectileMove, 
                 TextureID textureID);
     ~Humanoid();
+
     void move(Movement &dir);
     std::vector<Projectile*> shoot(double targetx, double targety, bool soulBullet);
-
+    ShootStyle getShootStyle();
+    void setShootStyle(ShootStyle ss);
 protected:
     int shootCooldown; // the current time left before being able to shoot again
     int shootTimer; // the time between each shot

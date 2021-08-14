@@ -21,7 +21,7 @@ enum EntityType
     ET_PROJECTILE
 };
 
-class Entity
+class Entity //ABS
 {
 public:
     Entity(void);
@@ -43,6 +43,8 @@ public:
     SDL_Rect * getHitbox(void);
     bool entityCollision(SDL_Rect * a);
 
+    moveProjectileFunc getProjMoveFunc();
+    void setProjMoveFunc(moveProjectileFunc func);
     virtual void move(Movement &dir) = 0;
     virtual Position testMove(Movement &dir);
     bool damage(int amount);

@@ -129,6 +129,16 @@ EntityType Entity::getType(void)
     return entityType;
 }
 
+moveProjectileFunc Entity::getProjMoveFunc()
+{
+    return projectileMove;
+}
+
+void Entity::setProjMoveFunc(moveProjectileFunc func)
+{
+    projectileMove = func;
+}
+
 /**
  * Adjusts hitbox based on entity type
  * 
