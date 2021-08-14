@@ -1,10 +1,24 @@
+/**
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
+*/
+
 #include "HUD.h"
 
+/**
+ * Constructor
+ * 
+ * @param renderer External SDL renderer
+ * @param player Pointer to player object
+ * @param txMan Pointer to texture manager
+ */
 HUD::HUD(SDL_Renderer *renderer, Humanoid *player, TextureManager *txMan): renderer(renderer), txMan(txMan), player(player), lastTime(0), elapsedTime(0), isPaused(false) {
     fontBold = TTF_OpenFont("assets/fonts/Courier New Bold.ttf", FONT_SIZE);
     fontNormal = TTF_OpenFont("assets/fonts/Courier New.ttf", FONT_SIZE);
 }
 
+// Destructor
 HUD::~HUD(void) {
     renderer = NULL;
     player = NULL;
@@ -14,6 +28,9 @@ HUD::~HUD(void) {
     TTF_CloseFont(fontBold);
 }
 
+/**
+ * Redaw player info and timer
+ */
 void HUD::refresh(void) {
     int lastX = 0;
 
@@ -67,21 +84,33 @@ int HUD::renderText(std::string text, bool isBold, int offsetX) {
     return offsetX + pos.w;
 }
 
+/**
+ * Start timer
+ */
 void HUD::startTimer(void) {
     isPaused = false;
 }
 
+/**
+ * Stop timer
+ */
 void HUD::stopTimer(void) {
     isPaused = true;
     elapsedTime += SDL_GetTicks() - lastTime;
     lastTime = SDL_GetTicks();
 }
 
+/**
+ * Reset timer to zero
+ */
 void HUD::resetTimer(void) {
     elapsedTime = 0;
     lastTime = 0;
 }
 
+/**
+ * Parse time elapsed into separate clock units
+ */
 TimeUnits HUD::getTime(void) {
     TimeUnits t;
     

@@ -1,17 +1,15 @@
+/**
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
+ */
+
 #ifndef _MOVEMENT_
 #define _MOVEMENT_
 #define _USE_MATH_DEFINES
 
-//theta = 0 is defined to be right ->
-//negative theta is counterclockwise
-//positive theta is clockwise
-//left is negative x, right is positive x
-//up is negative y, down is positive y
-//basically opposite from what you might expect, be careful
-
-
-//comment this out if not debugging
-//#define ENTITYDEBUG
+// Comment this out if not debugging
+// #define ENTITYDEBUG
 
 #ifdef ENTITYDEBUG
 #include <iostream>
@@ -20,12 +18,14 @@
 
 #define NUM_OF_PROJ_MOVE_FUNCS 5
 
+// Defines a position on a 2-D plane
 struct Position
 {
     double x;
     double y;
 };
 
+// Defines movement for cardinal directions
 struct Movement
 {
     bool left = false;
@@ -34,29 +34,26 @@ struct Movement
     bool right = false;
 };
 
-//0 radians is up, positive y is up, positive x is right
-//these functions are for convenience
+// Converting from cardinal directions to angles and vice-versa
+// 0 radians is up, positive y is up, positive x is right
 double convertCoordsToRads(int startx, int starty, int endx, int endy);
 Movement convertCoordsToMovement(int startx, int starty, int endx, int endy);
 Movement convertRadsToMovement(double rads);
 double convertMovementToRads(Movement &dir);
 
-//nice clean code
+// Definitions for functons passed for moving entities
 typedef Position (*moveEntityFunc)(double posx, double posy, Movement dir, double speed);
 typedef Position (*moveProjectileFunc)(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
 
-//entity movement functions
+// Specific instances entity movement functions
 Position moveLeft(double posx, double posy, Movement dir, double speed);
 Position movePlayer(double posx, double posy, Movement dir, double speed);
 
-//projectile movement functions
+// Projectile movement functions
 Position moveLeft(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
 Position moveDirection(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
-//Position moveTracking(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
 Position moveSpiral(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
 Position moveCorkscrew(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
 Position moveSine(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
 Position moveBoomerang(double startx, double starty, double posx, double posy, double &direction, double thetaAim, double &speed);
-
-
 #endif

@@ -1,12 +1,17 @@
 /**
- * Texture Manager for Soulgun
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
  */
 
-#pragma once
+#ifndef _TEXTUREMANAGER_
+#define _TEXTUREMANAGER_
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string>
 
+// Identifiers for textures
 enum TextureID
 {
     TX_PLAYER,
@@ -29,7 +34,7 @@ enum TextureID
 class TextureManager
 {
 public:
-    TextureManager(SDL_Renderer *renderer);
+    TextureManager(SDL_Renderer *xRenderer);
     ~TextureManager(void);
 
     SDL_Texture *getTexture(TextureID id);
@@ -49,8 +54,9 @@ private:
 
     SDL_Texture *textures[TX_TOTAL];
     SDL_Point dimensions[TX_TOTAL];
-    SDL_Renderer *xRenderer;
+    SDL_Renderer *renderer;
 
     SDL_Texture *load(TextureID id);
     void unload(TextureID id);
 };
+#endif

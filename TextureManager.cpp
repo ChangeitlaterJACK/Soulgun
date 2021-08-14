@@ -1,3 +1,9 @@
+/**
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
+*/
+
 #include "TextureManager.h"
 
 /**
@@ -5,9 +11,9 @@
  *
  * @param renderer An external renderer needed to create textures
  */
-TextureManager::TextureManager(SDL_Renderer *renderer)
+TextureManager::TextureManager(SDL_Renderer *xRenderer)
 {
-    xRenderer = renderer;
+    renderer = xRenderer;
 
     for (int id = 0; id < TX_TOTAL; ++id)
     {
@@ -64,7 +70,7 @@ SDL_Texture *TextureManager::load(TextureID id)
         unload(id);
 
     const char *path = paths[id].c_str();
-    SDL_Texture *texture = IMG_LoadTexture(xRenderer, path);
+    SDL_Texture *texture = IMG_LoadTexture(renderer, path);
 
     if (!texture)
         printf("Error creating texture from %s: %s", path, SDL_GetError());

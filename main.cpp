@@ -12,10 +12,11 @@
 #include "HUD.h"
 
 #define REFRESH_RATE 15
+#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH 1024
 
 using namespace std;
 
-//function prototype
 bool eventFinder(SDL_Event &event, Movement &movement);
 
 int main (int argc, char **argv) {
@@ -24,20 +25,22 @@ int main (int argc, char **argv) {
 	//Event handler
 	SDL_Event event;
 
+	// Initialize SDL objects
 	SDL_Init(SDL_INIT_EVERYTHING);
 	TTF_Init();
 
-	SDL_Window *window = SDL_CreateWindow("Soulgun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 1024, 0);
+	SDL_Window *window = SDL_CreateWindow("Soulgun", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+
+	// Create all of the objects for the game engine
 	TextureManager *txMan = new TextureManager(renderer);
-	//Creates MapManger object
 	MapManager *map = new MapManager(txMan);
 	DisplayManager dispMan(renderer, txMan, map);
 	vector<Projectile*> playerShots;
-
 	Humanoid *player = dispMan.spawnHumanoid(map, ET_PLAYER);
 	HUD *hud = new HUD(renderer, player, txMan);
 
+	// Start the game loop
 	int nextRefresh = SDL_GetTicks();
 	while (event.type != SDL_QUIT)
 	{
@@ -56,7 +59,8 @@ int main (int argc, char **argv) {
 			for (int i = 0; i < playerShots.size(); ++i)
 				dispMan.addProjectile(playerShots[i]);
 		}
-		if(map->mapCollision(player->testMove(movement)))
+
+		if (map->mapCollision(player->testMove(movement)))
 		{
 			player->move(movement);
 			dispMan.updateWindowPos(player->getPosition());
@@ -68,33 +72,33 @@ int main (int argc, char **argv) {
 			SDL_Delay(nextRefresh - now);
 		nextRefresh = now + REFRESH_RATE;
 		
-		
 		SDL_RenderClear(renderer);
 		
-		
-		// Redraw entities
+		// Respawn and recalculate entity positions
 		dispMan.spawnEnemies(map);
 		dispMan.moveEnemies(map, player);
 		dispMan.fireEnemies(player);
 		dispMan.moveProjectiles(player);
 
-        //checks if players health is below 0
+        // Game Over screen
         if(player->damage(0)){
             SDL_DestroyRenderer(renderer);
             SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
             SDL_Texture *gtext = IMG_LoadTexture(renderer, "assets/images/game_over.png");
-            //SDL_RenderCopy(renderer, (txMan->getTexture(TX_GAMEOVER)), NULL, NULL);
+
             SDL_RenderCopy(renderer, gtext, NULL, NULL);
             SDL_RenderPresent(renderer);
             SDL_Delay(2000);
             break;
         }
 
+		// Redraw entities on screen
 		dispMan.refresh();
 		hud->refresh();
 		SDL_RenderPresent(renderer);
 	}
 
+	// Cleanup
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -103,6 +107,13 @@ int main (int argc, char **argv) {
 	return 0;
 }
 
+/**
+ * Interprets keyboard events
+ * 
+ * @param event A keyboard event
+ * @param movement Movement struct that will be populated based on keyboard input
+ * @returns True if user presses the shoot key
+ */
 bool eventFinder(SDL_Event &event, Movement &movement){
 	const Uint8 *keystate = SDL_GetKeyboardState(NULL);
 

@@ -187,4 +187,3 @@ Development will happen in one week sprints, with each sprint introducing the fe
 	* Enemy-projectile collision detection
 
 
-

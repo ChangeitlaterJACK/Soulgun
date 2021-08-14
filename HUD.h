@@ -1,5 +1,7 @@
 /**
- * Heads-up display for Soulgun
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
  */
 
 #pragma once
@@ -18,6 +20,7 @@
 #define HUD_X 25
 #define HUD_Y 1024 - 25 - HUD_HEIGHT
 
+// Makes storing parts of time string easier
 struct TimeUnits {
     int hours = 0;
     int minutes = 0;

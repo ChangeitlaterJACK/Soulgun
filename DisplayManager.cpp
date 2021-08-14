@@ -1,3 +1,9 @@
+/**
+ * Soulgun
+ * Copyright (C) 2021 Change It Later JACK
+ * Distributed under the MIT software license
+ */
+
 #include "DisplayManager.h"
 
 /**
@@ -5,11 +11,13 @@
  *
  * @param xRenderer External renderer
  * @param xTexture External texture manager
+ * @param map Pointer to the map object
  */
-DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, MapManager *map) {
+DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, MapManager *map) 
+{
     renderer = xRenderer;
     txMan = xTexture;
-		renderMap = map;
+	renderMap = map;
 
     maxSpawnCooldown = 1000;
     newSpawnCooldown = maxSpawnCooldown;
@@ -20,36 +28,37 @@ DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture
 /**
  * Deconstructs all entities
  */
-DisplayManager::~DisplayManager(void) {
+DisplayManager::~DisplayManager(void) 
+{
     for (int i = 0; i != entities.size(); ++i) {
         delete entities[i];
     }
     entities.clear();
+
+    for (int i = 0; i != projectiles.size(); ++i) {
+        delete projectiles[i];
+    }
+    projectiles.clear();
 }
 
 /**
- * Pass in window and what you Position you want window to focus on
+ * Pan the camera as player moves
+ * 
+ * @param window_focus The coordinates that the camera is focusing on
  */
-void DisplayManager::updateWindowPos(Position window_focus){
-	point_of_view.h = 5000;
-	point_of_view.w = 5000;
-	if(window_focus.x >= 512 && window_focus.x <= MAX_TILES*TILE_WIDTH - 512)
-	  	point_of_view.x = 512 - window_focus.x;
-    // else if (window_focus.x < 512)
-    //     point_of_view.x = 512;
-    // else
-    //     point_of_view.x = MAX_TILES*TILE_WIDTH - 512;
+void DisplayManager::updateWindowPos(Position window_focus)
+{
+    point_of_view.h = 5000;
+    point_of_view.w = 5000;
 
-	if(window_focus.y >= 512 && window_focus.y <= MAX_TILES*TILE_HEIGHT - 512)
-		point_of_view.y = 512 - window_focus.y;
-    // else if (window_focus.y < 512)
-    //     point_of_view.y = 512;
-    // else
-    //     point_of_view.y = MAX_TILES*TILE_WIDTH - 512;
+    // Move unless camera is going beyond the edge of the map 
+    if (window_focus.x >= 512 && window_focus.x <= MAX_TILES * TILE_WIDTH - 512)
+        point_of_view.x = 512 - window_focus.x;
+
+    if (window_focus.y >= 512 && window_focus.y <= MAX_TILES * TILE_HEIGHT - 512)
+        point_of_view.y = 512 - window_focus.y;
 
     SDL_RenderSetViewport(renderer, &point_of_view);
-    //SDL_RenderSetClipRect(renderer, &point_of_view);
-	
 }
 
 /**
@@ -97,15 +106,18 @@ void DisplayManager::spawnEnemies(MapManager *map) {
             break;
         }
     }
-    //keep the number of spawns constrained
+    // keep the number of spawns constrained
     if (humans + robots > 40)
+    {
         newSpawnCooldown = 50;
+    }
     else if (humans + robots < 2)
     {
         newSpawnCooldown = 0;
         firstSpawn = true;
     }
-    //spawn enemies at a generally increasing rate
+
+    // spawn enemies at a generally increasing rate
     if (newSpawnCooldown <= 0)
     {
         if (rand() % 4 > 0)
@@ -115,12 +127,15 @@ void DisplayManager::spawnEnemies(MapManager *map) {
 
         newSpawnCooldown = maxSpawnCooldown;
         maxSpawnCooldown -= 15;
+
         if (maxSpawnCooldown < 500)
             maxSpawnCooldown = 600;
         firstSpawn = false;
     }
-    else
+    else 
+    {
         newSpawnCooldown -= 1;
+    }
 }
 
 /**
@@ -146,18 +161,20 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
     // Have enemies encircle the player
     float unitCircle = 2 * M_PI;
 
-    //initial values and variables
+    // initial values and variables
     double x;
     double y;
     Position newPos;
+
     double speed;
     double health;
     int shootCooldown = 500; //starting value of the cooldown
     ShootStyle ss;
-    moveProjectileFunc projMoveFunc;
-    double theta = (rand() % 628)*0.01;
 
-    //pick a random available location around player to spawn at
+    moveProjectileFunc projMoveFunc;
+    double theta = (rand() % 628) * 0.01;
+
+    // pick a random available location around player to spawn at
     x = pos.x + cos(theta) * SPAWN_DIST;
     y = pos.y + sin(theta) * SPAWN_DIST;
     newPos.x = x;
@@ -171,20 +188,22 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
         newPos.y = y;
     }
 
-    //generate randomized stats
+    // generate randomized stats
     speed = (type == static_cast<int>(TX_HUMAN)) ? 0.4: 0.2;
     speed += (rand() % 30)*0.05;
     health = (type == static_cast<int>(TX_HUMAN)) ? rand() % 3 + 2: rand() % 2 + 1;
-    ss = static_cast<ShootStyle>(rand()%SS_TOTAL);
+
+    // Randomize shooting style
+    ss = static_cast<ShootStyle>(rand() % SS_TOTAL);
     if (ss != SS_SINGLESHOT)
-        ss = static_cast<ShootStyle>(rand()%SS_TOTAL);
+        ss = static_cast<ShootStyle>(rand() % SS_TOTAL);
     if (ss == SS_8WAY || ss == SS_SPIRAL)
-        ss = static_cast<ShootStyle>(rand()%SS_TOTAL);
+        ss = static_cast<ShootStyle>(rand() % SS_TOTAL);
     if (ss == SS_8WAY || ss == SS_SPIRAL)
-        shootCooldown += rand()%100 + 50;
+        shootCooldown += rand() % 100 + 50;
         
-    //generate randomized shooting styles, projectile movements, and appropriate shooting cooldowns
-    switch(rand()%(NUM_OF_PROJ_MOVE_FUNCS+5))
+    // generate randomized shooting styles, projectile movements, and appropriate shooting cooldowns
+    switch (rand() % (NUM_OF_PROJ_MOVE_FUNCS + 5))
     {
         case 0:
         case 1:
@@ -215,6 +234,7 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
             projMoveFunc = moveDirection;
             break;
     }
+
     if (firstSpawn) //make sure the first two are very basic to let the player learn how to play
     {
         ss = SS_SINGLESHOT;
@@ -331,6 +351,7 @@ void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
 
 /**
  * Indicates whether an enemy is located near a coordinate
+ * Todo: Do some pythagorean theorem magic to incorporate proximity
  *
  * @param x X coorindate
  * @param y Y coordinate
@@ -342,7 +363,6 @@ bool DisplayManager::isNearEnemy(int x, int y, int proximity) {
         Entity *e = entities[i];
         Position pos = e->getPosition();
 
-        // Todo: Do some pythagorean theorem magic to incorporate proximity
         if (pos.x == x && pos.y == y)
             return true;
     }
@@ -350,12 +370,20 @@ bool DisplayManager::isNearEnemy(int x, int y, int proximity) {
     return false;
 }
 
-
-//add a projectile to display manager
+/**
+ * Adds a projectile
+ * 
+ * @param proj Pointer to the projectile
+ */
 void DisplayManager::addProjectile(Projectile *proj) {
     projectiles.push_back(proj);
 }
-//remove a projectile from display manager
+
+/**
+ * Removes a projectile
+ * 
+ * @param proj Pointer to the projectile
+ */
 void DisplayManager::removeProjectile(Projectile *proj) {
     for (int i = 0; i < projectiles.size(); ++i) {
         if (projectiles[i] == proj) {
@@ -364,57 +392,82 @@ void DisplayManager::removeProjectile(Projectile *proj) {
         }
     }
 }
-//call the shoot function for all enemies and add returned projectiles to the display manager projectiles list
+
+/**
+ * Handles enemies shooting.
+ * 
+ * @param player Pointer to the player
+ */
 void DisplayManager::fireEnemies(Humanoid *player)
 {
     Position playerPos = player->getPosition();
     int posx = playerPos.x;
     int posy = playerPos.y;
+
     Humanoid *e = nullptr;
     std::vector<Projectile*> p;
     for (int i = 0; i < entities.size(); ++i)
     {
+        // Shooting instantiates a list of projectile objects
         e = entities[i];
         if (e->getType() != ET_PLAYER)
             p = e->shoot(posx, posy, false);
+
+        // Add the spawned projectiles to the manager
         for (int i = 0; i < p.size(); ++i)
             addProjectile(p[i]);
     }
 }
-//move all projectiles using their propper projectileMove functions
+
+/**
+ * Move projectiles using each projectile's movement function
+ * 
+ * @param player Pointer to the player
+ */
 void DisplayManager::moveProjectiles(Humanoid *player) {
     Position playerPos = player->getPosition();
     Projectile *p = NULL;
+
     Movement mov;
     int direction = 0;
-    int now = SDL_GetTicks();
     Position enemyPos;
     Position projPos;
     double thetaAim;
-    for (int i = 0; i < projectiles.size(); ++i) {
+
+    int now = SDL_GetTicks();
+
+    // Iterate through projectiles
+    for (int i = 0; i < projectiles.size(); ++i) 
+    {
         p = projectiles[i];
         projPos = p->getPosition();
         thetaAim = convertCoordsToRads(projPos.x, projPos.y, playerPos.x, playerPos.y);
+
+        // Determine if player was hit by projectile
  		if (!(p->isSoulBullet()) && player->entityCollision(p->getHitbox()))
         {
             player->damage(p->getPower());
 			removeProjectile(p);
         }
-        //check if bullet is from player
+        // Or projectile was fired by player
         else if (p->isSoulBullet())
         {
             for (int i = 0; i < entities.size(); ++i)
             {
                 if (entities[i]->getType() != ET_PLAYER)
                 {
+                    // Determine if the projectile hit an entity
                     if ((entities[i])->entityCollision(p->getHitbox()))
                     {
-                        //if bullet hit another entity(humanoid)
+                        // If bullet hit a humanoid steal its soul
                         if(swapSpots(entities[i])){
                             entities.erase(entities.begin() + i);
-                        }//bullet didnt hit a humanoid
+                        }
+                        // bullet didnt hit a humanoid
                         else if (entities[i]->damage(p->getPower()))
+                        {
                             removeEntity(entities[i]);
+                        }
                         removeProjectile(p);
                     }
                 }
@@ -423,10 +476,11 @@ void DisplayManager::moveProjectiles(Humanoid *player) {
             }
         }
       	else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
+        {
             removeProjectile(p);
+        }
     }
 }
-
 
 /**
  * Draws textures on the window where they are currently located
@@ -439,9 +493,10 @@ void DisplayManager::refresh(void) {
     Humanoid *e;
     Projectile *p;
 
-    // Map rendering
-		renderMap->mapDrawer(renderer);
+    // Render map
+	renderMap->mapDrawer(renderer);
 
+    // Render entities
     for (int i = 0; i < entities.size(); ++i) {
         e = entities[i];
 
@@ -450,14 +505,14 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        // position.x  = e->x - map->offset_x;
-        // position.y  = e->y - map->offset_y;
         Position pos = e->getPosition();
         position.x  = pos.x;
         position.y  = pos.y;
 
         SDL_RenderCopy(renderer, texture, NULL, &position);
     }
+
+    // Render projectiles
     for (int i = 0; i < projectiles.size(); ++i) {
         p = projectiles[i];
 
@@ -466,8 +521,6 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        // position.x  = e->x - map->offset_x;
-        // position.y  = e->y - map->offset_y;
         Position pos = p->getPosition();
         position.x  = pos.x;
         position.y  = pos.y;
@@ -476,51 +529,72 @@ void DisplayManager::refresh(void) {
     }
 }
 
+/**
+ * Do a flash animation in a box shape
+ * 
+ * @param startx X-coord
+ * @param starty Y-coord
+ * @param Width width of flash
+ * @param Height height of flash
+ */
 void DisplayManager::flashBox(int startx, int starty, int Width, int Height){
-    //select the color you want to render (red, green, blue, alpha)
+     // Render color: RGBA
     SDL_SetRenderDrawColor(renderer, 255, 0, 255, 255);
 
-    //creates box
     SDL_Rect box;
     box.x = startx;
     box.y = starty;
     box.w = Width;
     box.h = Height;
 
-    //adds box and displays
     SDL_RenderFillRect(renderer, &box);
     SDL_RenderPresent(renderer);
     SDL_RenderClear(renderer);
 }
 
+/**
+ * Do a flash animation on the entire screen
+ * 
+ * @param startx X-coord
+ * @param starty Y-coord
+ * @param Width width of flash
+ * @param Height height of flash
+ */
 void DisplayManager::flashScreen(){
-    //select the color you want to render (red, green, blue, alpha)
+    // Render color: RGBA
     SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
 
-    //creates box
     SDL_Rect box;
     box.x = 0;
     box.y = 0;
     box.w = MAP_WIDTH;
     box.h = MAP_HEIGHT;
 
-    //adds box and displays
     SDL_RenderFillRect(renderer, &box);
     SDL_RenderPresent(renderer);
-    //SDL_RenderClear(renderer);
 }
 
-bool DisplayManager::swapSpots(Humanoid *toSwap){
+/**
+ * Swap the player with a humanoid entity
+ * 
+ * @param toSwap Pointer to the human to switch with
+ * @returns True if swap was done
+ */
+bool DisplayManager::swapSpots(Humanoid *toSwap)
+{
     //double checks that the first item is the player
-    if (entities[0]->getType() == ET_PLAYER){
-        if(toSwap->getType() == ET_HUMAN){
+    if (entities[0]->getType() == ET_PLAYER)
+    {
+        if(toSwap->getType() == ET_HUMAN)
+        {
             Position newPos = toSwap->getPosition();
             entities[0]->setLocation(newPos);
             entities[0]->setHitboxPos(newPos);
             entities[0]->setProjMoveFunc(toSwap->getProjMoveFunc());
             entities[0]->setShootStyle(toSwap->getShootStyle());
             flashScreen();
-            flashBox(newPos.x-5, newPos.y-5, newPos.x+5, newPos.y+5);
+            flashBox(newPos.x - 5, newPos.y - 5, newPos.x + 5, newPos.y + 5);
+
             return true;
         }
     }
