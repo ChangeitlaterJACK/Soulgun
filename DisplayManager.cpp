@@ -48,15 +48,15 @@ DisplayManager::~DisplayManager(void)
  */
 void DisplayManager::updateWindowPos(Position window_focus)
 {
-	point_of_view.h = 5000;
-	point_of_view.w = 5000;
+    point_of_view.h = 5000;
+    point_of_view.w = 5000;
 
     // Move unless camera is going beyond the edge of the map 
-	if(window_focus.x >= 512 && window_focus.x <= MAX_TILES * TILE_WIDTH - 512)
-	  	point_of_view.x = 512 - window_focus.x;
+    if (window_focus.x >= 512 && window_focus.x <= MAX_TILES * TILE_WIDTH - 512)
+        point_of_view.x = 512 - window_focus.x;
 
-	if(window_focus.y >= 512 && window_focus.y <= MAX_TILES * TILE_HEIGHT - 512)
-		point_of_view.y = 512 - window_focus.y;
+    if (window_focus.y >= 512 && window_focus.y <= MAX_TILES * TILE_HEIGHT - 512)
+        point_of_view.y = 512 - window_focus.y;
 
     SDL_RenderSetViewport(renderer, &point_of_view);
 }
@@ -203,7 +203,7 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
         shootCooldown += rand() % 100 + 50;
         
     // generate randomized shooting styles, projectile movements, and appropriate shooting cooldowns
-    switch(rand()%(NUM_OF_PROJ_MOVE_FUNCS+5))
+    switch (rand() % (NUM_OF_PROJ_MOVE_FUNCS + 5))
     {
         case 0:
         case 1:
@@ -465,7 +465,9 @@ void DisplayManager::moveProjectiles(Humanoid *player) {
                         }
                         // bullet didnt hit a humanoid
                         else if (entities[i]->damage(p->getPower()))
+                        {
                             removeEntity(entities[i]);
+                        }
                         removeProjectile(p);
                     }
                 }

@@ -154,8 +154,9 @@ void Entity::setProjMoveFunc(moveProjectileFunc func)
  * 
  * @param ID entity type identifier
  */
-void Entity::setHitbox(EntityType ID){
-    if(ID == ET_PROJECTILE)
+void Entity::setHitbox(EntityType ID)
+{
+    if (ID == ET_PROJECTILE)
     {
         hitbox.h = 5;
         hitbox.w = 5;
@@ -168,7 +169,7 @@ void Entity::setHitbox(EntityType ID){
 }
 
 /**
- * Adjusts hitbox locatio
+ * Adjusts hitbox location
  * 
  * @param entity Entity's current position
  */

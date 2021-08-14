@@ -80,7 +80,7 @@ int main (int argc, char **argv) {
 		dispMan.fireEnemies(player);
 		dispMan.moveProjectiles(player);
 
-        // Game Over screen -- currently may crash on some platforms
+        // Game Over screen
         if(player->damage(0)){
             SDL_DestroyRenderer(renderer);
             SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);

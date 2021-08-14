@@ -188,7 +188,7 @@ SDL_Texture* MapManager::textureUnloader(int tile_type)
  */
 bool MapManager::mapCollision(Position player)
 {
-	if (player.x <= 0 || player.y <= 0 || player.x + 20 >= MAX_TILES*TILE_WIDTH || player.y + 25 >= MAX_TILES*TILE_HEIGHT) 
+	if (player.x <= 0 || player.y <= 0 || player.x + 20 >= MAX_TILES * TILE_WIDTH || player.y + 25 >= MAX_TILES * TILE_HEIGHT) 
 		return false;
 
 	if (gameMap[player.y / TILE_WIDTH][player.x / TILE_HEIGHT]->getType() == TID_WALL ||

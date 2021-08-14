@@ -18,7 +18,7 @@ Humanoid::Humanoid() :
 }
 
 // Copy constructor
-Humanoid::Humanoid(const Humanoid &humanoid) :
+Humanoid::Humanoid(const Humanoid &humanoid):
     Entity(humanoid),
     shootCooldown(100),
     shootTimer(shootCooldown),
@@ -56,11 +56,21 @@ Humanoid::Humanoid(int health, EntityType entityType,
 // Destructor
 Humanoid::~Humanoid() { }
 
+/**
+ * Getter for shoot style
+ * 
+ * @returns A ShootStyle constant
+ */
 ShootStyle Humanoid::getShootStyle()
 {
     return shootStyle;
 }
 
+/**
+ * Setter for shoot style
+ * 
+ * @param ss A ShootStyle constant
+ */
 void Humanoid::setShootStyle(ShootStyle ss)
 {
     shootStyle = ss;
