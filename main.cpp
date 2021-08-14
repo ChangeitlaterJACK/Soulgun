@@ -65,7 +65,7 @@ int main (int argc, char **argv) {
 			player->move(movement);
 			dispMan.updateWindowPos(player->getPosition());
 		}
-		
+
 		// Wait for refresh delay
 		int now = SDL_GetTicks();
 		if (now < nextRefresh)
