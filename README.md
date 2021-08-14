@@ -2,6 +2,8 @@
 A cross-platform "bullet hell" game where your gun can possess your enemies.  The player will dodge bullets from neverending barrage of robotic and humanoid enemies. If the players projectile kills a humanoid, the player will change to the humanoids location and inherit its shooting style.
 _ChangeitlaterJACK 2021_
 
+A demo and short overview of the program can be found in "Soulgun Project Video.mp4"
+
 ## Contributors
 * **J**ared Collums
 * **A**leksandr Kaletin
@@ -14,6 +16,8 @@ _ChangeitlaterJACK 2021_
 
 ## Attributions
 Special thanks to [Lazy Foo' Productions](https://lazyfoo.net/tutorials/SDL/) for the tutorial on SDL usage and capabilities.
+
+Special thanks to [Giovanni Codes Games](https://giovanni.codes) for a guide on installing SDL2 on Windows with VSCode.
 
 Entity sprites based on graphics designed by [OpenMoji](https://openmoji.org/) – the open-source emoji and icon project. License: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/#)
 
@@ -32,6 +36,36 @@ This will add the needed SDL2 framework to compile Soulgun.
 
 After that you can easily compile the game by typing "make" from the terminal in the game directory where the Makefile is.
 
+## Build instructions Linux
+
+If you have administrator privileges on your machine, follow these LazyFoo tutorials to install [SDL2](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/linux/index.php) and [SDL2_image](https://lazyfoo.net/tutorials/SDL/06_extension_libraries_and_loading_other_image_formats/linux/index.php)
+
+If you do not have admin permissions or are unable to install it in traditional ways, do this using your command line.
+
+	Go to the directory you wish to install SDL2, and remember the path name of that directory
+	Enter the command: git clone https://github.com/libsdl-org/SDL.git
+	Go into the SDL directory: cd SDL
+	Open the Makefile file and change the prefix to the absolute path to get to your directory/local
+	Back on the command line, create a directory called build, and enter it: mkdir build; cd build
+	Run the configure script in the parent directory: ../configure
+	Compile and install SDL: make; make install
+	Do the same for SD2L_image
+
+To download Soulgun
+
+	In the directory of your choice, enter this command: git clone https://github.com/ChangeitlaterJACK/Soulgun
+	Then in the Soulgun directory, compile Soulgun with this command: make lab
+	Soulgun can then be run with the following command: ./Soulgun.exe
+
+
+## Build instructions Windows
+
+Windows is currently not supported and has many bugs. 
+
+If you would still like to install Soulgun on Windows you can follow [LazyFoo's Windows installation guides](https://lazyfoo.net/tutorials/SDL/01_hello_SDL/windows/index.php), or [Giovanni Codes Games' VSCode installation guide](https://giovanni.codes/setup-sdl2-with-visual-studio-code-and-mingw64-on-windows/).
+
+Be aware that the setup for SDL2 and SDL2_image can be very finicky.
+
 
 ## Overview of how entities and projectiles work
 * Humanoids can be either humans or robots. A humans soul can be stolen by the player, giving the player the stats of the human. Human and robots stats include health, movement speed, a shooting cooldown, and bullet patterns. 
@@ -45,7 +79,7 @@ After that you can easily compile the game by typing "make" from the terminal in
 	* Hold space to shoot. Aiming is based on previous movement direction
 
 
-## Development Roadmap
+## Development Roadmap at the Start of the Term
 Development will happen in one week sprints, with each sprint introducing the features specified below.  Specific milestone deadlines may be shifted as needed.  After the last of these sprints we hope to have a coherent game whose mechanics and assets can be easily built upon.
 
 ### Week 1 - Prototype
@@ -88,17 +122,18 @@ Development will happen in one week sprints, with each sprint introducing the fe
 	* Rudimentary Sound effects
 	* Better map graphics
 
-## Project Workflow
+## Project Workflow Through the Term
 - Week 1 
  	* Texture Manager 
  	
 - Week 2 
-	* Display Manager 
+	* Display Manager
 	* Makefile 
 	* Reading keyboard input 
 	* Entity implementation
 
 - Week 3 
+	* Basic game loop
 	* Enemy spawning 
 	* Map manager
 	* Enemy AI movement
