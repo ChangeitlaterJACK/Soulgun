@@ -41,16 +41,7 @@ public:
     SDL_Point getDimensions(TextureID id);
 
 private:
-    const std::string paths[TX_TOTAL] = {
-        "assets/images/openmoji-player.png",
-        "assets/images/openmoji-robot.png",
-        "assets/images/openmoji-human.png",
-        "assets/images/placeholder-bullet.png",
-        "assets/images/placeholder-terrain.png",
-        "assets/images/placeholder-wall.png",
-        "assets/images/placeholder-pit.png",
-        "assets/images/game_over.png"
-    };
+    std::string paths[TX_TOTAL];
 
     SDL_Texture *textures[TX_TOTAL];
     SDL_Point dimensions[TX_TOTAL];

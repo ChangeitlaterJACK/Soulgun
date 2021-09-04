@@ -104,6 +104,8 @@ void DisplayManager::spawnEnemies(MapManager *map) {
             case ET_PLAYER:
                 player = (e);
             break;
+            case ET_PROJECTILE:
+            break;
         }
     }
     // keep the number of spawns constrained
@@ -344,6 +346,10 @@ void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
                 else if (map->mapCollision(h->testMove(mov))) {
                     h->move(h->moveDirection);
                 }
+            break;
+            case ET_PLAYER:
+            case ET_PROJECTILE:
+            default:
             break;
         }
     }

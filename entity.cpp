@@ -32,16 +32,16 @@ Entity::Entity(void):
 }
 
 // Copy constructor
-Entity::Entity(const Entity &entity) :
-    maxHealth(maxHealth),
-    health(maxHealth),
+Entity::Entity(const Entity &entity):
+    maxHealth(entity.maxHealth),
+    health(entity.maxHealth),
     entityType(ET_PLAYER),
-    posx(posx),
-    posy(posy),
-    speed(speed),
-    entityMove(entityMove),
-    projectileMove(projectileMove),
-    textureID(textureID)
+    posx(entity.posx),
+    posy(entity.posy),
+    speed(entity.speed),
+    entityMove(entity.entityMove),
+    projectileMove(entity.projectileMove),
+    textureID(entity.textureID)
 {
 	setHitbox(entityType);
 #ifdef ENTITYDEBUG

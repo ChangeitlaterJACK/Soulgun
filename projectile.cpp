@@ -25,11 +25,11 @@ Projectile::Projectile():
 // Copy constructor
 Projectile::Projectile(const Projectile &projectile):
     Entity(projectile),
-    power(power),
-    soulBullet(soulBullet),
-    startx(startx),
-    starty(starty),
-    direction(direction)
+    power(projectile.power),
+    soulBullet(projectile.soulBullet),
+    startx(projectile.startx),
+    starty(projectile.starty),
+    direction(projectile.direction)
 {
 #ifdef ENTITYDEBUG
         cout << "Created projectile from copy. " << endl;

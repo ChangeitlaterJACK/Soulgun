@@ -22,10 +22,10 @@
 
 // Makes storing parts of time string easier
 struct TimeUnits {
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-    int ms = 0;
+    int hours;
+    int minutes;
+    int seconds;
+    int ms;
 };
 
 /**

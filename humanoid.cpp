@@ -21,8 +21,8 @@ Humanoid::Humanoid() :
 Humanoid::Humanoid(const Humanoid &humanoid):
     Entity(humanoid),
     shootCooldown(100),
-    shootTimer(shootCooldown),
-    shootStyle(shootStyle)
+    shootTimer(humanoid.shootCooldown),
+    shootStyle(humanoid.shootStyle)
 {
 }
 
