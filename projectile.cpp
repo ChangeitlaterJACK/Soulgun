@@ -4,7 +4,7 @@
  * Distributed under the MIT software license
 */
 
-#include "projectile.h"
+#include "Projectile.h"
 
 using namespace std;
 

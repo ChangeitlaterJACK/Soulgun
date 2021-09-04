@@ -5,8 +5,8 @@
 #endif //LAB
 
 #include <iostream>
-#include "map.h"
-#include "humanoid.h"
+#include "Map.h"
+#include "Humanoid.h"
 #include "TextureManager.h"
 #include "DisplayManager.h"
 #include "HUD.h"
@@ -34,7 +34,7 @@ int main (int argc, char **argv) {
 
 	// Create all of the objects for the game engine
 	TextureManager *txMan = new TextureManager(renderer);
-	MapManager *map = new MapManager(txMan);
+	Map *map = new Map(txMan);
 	DisplayManager dispMan(renderer, txMan, map);
 	vector<Projectile*> playerShots;
 	Humanoid *player = dispMan.spawnHumanoid(map, ET_PLAYER);
@@ -60,7 +60,7 @@ int main (int argc, char **argv) {
 				dispMan.addProjectile(playerShots[i]);
 		}
 
-		if (map->mapCollision(player->testMove(movement)))
+		if (map->isPlayerColliding(player->testMove(movement)))
 		{
 			player->move(movement);
 			dispMan.updateWindowPos(player->getPosition());

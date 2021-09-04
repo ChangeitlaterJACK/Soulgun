@@ -13,7 +13,7 @@
  * @param xTexture External texture manager
  * @param map Pointer to the map object
  */
-DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, MapManager *map) 
+DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, Map *map) 
 {
     renderer = xRenderer;
     txMan = xTexture;
@@ -79,7 +79,7 @@ void DisplayManager::removeEntity(Humanoid *entity) {
 /**
  * Spawns enemies as needed
  */
-void DisplayManager::spawnEnemies(MapManager *map) {
+void DisplayManager::spawnEnemies(Map *map) {
     int humans = 0;
     int robots = 0;
     Humanoid *player = NULL;
@@ -139,7 +139,7 @@ void DisplayManager::spawnEnemies(MapManager *map) {
  * @param player Pointer to the player
  * @returns A pointer to the humanoid spawned
  */
-Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humanoid *player) {
+Humanoid *DisplayManager::spawnHumanoid(Map *map, EntityType type, Humanoid *player) {
     // Place player at center of map
     if (type == ET_PLAYER) {
 
@@ -170,7 +170,7 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
     y = pos.y + sin(theta) * SPAWN_DIST;
     newPos.x = x;
     newPos.y = y;
-    while (!(map->mapCollision(newPos)))
+    while (!(map->isPlayerColliding(newPos)))
     {
     		theta = (rand() % 628)*0.01;
         x = pos.x + cos(theta) * SPAWN_DIST;
@@ -246,7 +246,7 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
  *
  * @param player Pointer to the player
  */
-void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
+void DisplayManager::moveEnemies(Map *map, Humanoid *player) {
     Position playerPos = player->getPosition();
     Humanoid *h = NULL;
 
@@ -285,10 +285,10 @@ void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
                     }
                     mov.down = !mov.up;
                     mov.left = !mov.right;
-                    if (map->mapCollision(h->testMove(mov)))
+                    if (map->isPlayerColliding(h->testMove(mov)))
                         h->move(mov);
                 }
-                else if (map->mapCollision(h->testMove(mov)))
+                else if (map->isPlayerColliding(h->testMove(mov)))
                 {
                     h->move(h->moveDirection);
                 }
@@ -329,10 +329,10 @@ void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
                         mov.left = false;
                         mov.right = false;
                     }
-                    if (map->mapCollision(h->testMove(mov)))
+                    if (map->isPlayerColliding(h->testMove(mov)))
                         h->move(mov);
                 }
-                else if (map->mapCollision(h->testMove(mov))) {
+                else if (map->isPlayerColliding(h->testMove(mov))) {
                     h->move(h->moveDirection);
                 }
             break;
@@ -459,11 +459,11 @@ void DisplayManager::moveProjectiles(Humanoid *player) {
                         removeProjectile(p);
                     }
                 }
-                else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
+                else if (p->move(thetaAim) || !renderMap->isPlayerColliding(p->getPosition()))
                     removeProjectile(p);
             }
         }
-      	else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
+      	else if (p->move(thetaAim) || !renderMap->isPlayerColliding(p->getPosition()))
         {
             removeProjectile(p);
         }
@@ -482,7 +482,7 @@ void DisplayManager::refresh(void) {
     Projectile *p;
 
     // Render map
-	renderMap->mapDrawer(renderer);
+	renderMap->refresh(renderer);
 
     // Render entities
     for (int i = 0; i < entities.size(); ++i) {

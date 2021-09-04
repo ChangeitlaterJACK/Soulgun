@@ -5,9 +5,9 @@
  */
 
 #pragma once
-#include "map.h"
+#include "Map.h"
 #include "TextureManager.h"
-#include "humanoid.h"
+#include "Humanoid.h"
 #include <vector>
 #include <math.h>
 #include <stdlib.h>
@@ -25,14 +25,14 @@
 class DisplayManager
 {
 public:
-    DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, MapManager *map);
+    DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, Map *map);
     ~DisplayManager(void);
 
 		void updateWindowPos(Position window_focus);
 
-    void spawnEnemies(MapManager *map);
-    Humanoid *spawnHumanoid(MapManager *map, EntityType type, Humanoid *player = NULL);
-    void moveEnemies(MapManager *map, Humanoid *player = NULL);
+    void spawnEnemies(Map *map);
+    Humanoid *spawnHumanoid(Map *map, EntityType type, Humanoid *player = NULL);
+    void moveEnemies(Map *map, Humanoid *player = NULL);
     bool isNearEnemy(int x, int y, int proximity);
     void fireEnemies(Humanoid *player = NULL);
     void moveProjectiles(Humanoid *player = NULL);
@@ -52,7 +52,7 @@ private:
     std::vector<Projectile *> projectiles;
 		SDL_Rect point_of_view;
     SDL_Renderer *renderer;
-		MapManager *renderMap;
+		Map *renderMap;
     TextureManager *txMan;
 
     int newSpawnCooldown;

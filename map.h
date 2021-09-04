@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include "entity.h"
+#include "Entity.h"
 #include "TextureManager.h"
 
 const int TILE_HEIGHT = 100;
@@ -27,11 +27,11 @@ enum tileID
 /**
  * Represents a single map tile
  */
-class mapTile 
+class MapTile 
 {
 public:
-	mapTile(void);
-	mapTile(int x, int y, tileID id, SDL_Texture * texture );
+	MapTile(void);
+	MapTile(int x, int y, tileID id, SDL_Texture * texture );
 	void setTileData(int x, int y, int h, int w, tileID id);
 	tileID getType(void);
 	SDL_Rect* getTile(void);
@@ -47,21 +47,21 @@ private:
  *
  * Handles drawing a collection of map tiles to the screen
  */
-class MapManager 
+class Map 
 {
 public:	
-	MapManager(TextureManager * txMan);
-	~MapManager(void);
+	Map(TextureManager * txMan);
+	~Map(void);
 	
-	void levelLoader(int level);
-	void texturePreloader(TextureManager * txMan); 
-	SDL_Texture* textureUnloader(int tile_type);
-	bool mapCollision(Position player);
+	void load(int level);
+	void retrieveTextures(TextureManager * txMan); 
+	SDL_Texture* getTileTexture(int tile_type);
+	bool isPlayerColliding(Position player);
 
 	tileID textureToTile(int tile_type);
 	TextureID tileToTexture(int texture_type);
-	void mapDrawer(SDL_Renderer * renderer); 
+	void refresh(SDL_Renderer * renderer); 
 private:
 	std::vector<SDL_Texture*> mapTextures;
-	std::vector<std::vector<mapTile*> > gameMap;
+	std::vector<std::vector<MapTile*> > gameMap;
 };

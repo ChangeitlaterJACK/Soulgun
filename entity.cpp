@@ -4,7 +4,7 @@
  * Distributed under the MIT software license
  */
 
-#include "entity.h"
+#include "Entity.h"
 
 using namespace std;
 

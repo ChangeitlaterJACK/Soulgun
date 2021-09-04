@@ -8,8 +8,8 @@
 #define _HUMANOID_
 
 #include <vector>
-#include "entity.h"
-#include "projectile.h"
+#include "Entity.h"
+#include "Projectile.h"
 
 // Time enemy will move in one direction before changing
 #define ROBOT_MOVE_TIME 500

@@ -7,7 +7,7 @@
 #ifndef _PROJECTILE_
 #define _PROJECTILE_
 
-#include "entity.h"
+#include "Entity.h"
 #include "movement.h"
 
 /**

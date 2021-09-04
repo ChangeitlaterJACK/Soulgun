@@ -4,14 +4,14 @@
  * Distributed under the MIT software license
 */
 
-#include "map.h"
+#include "Map.h"
 
 /**
  * Map Tile members
  */
 
 // Default constructor
-mapTile::mapTile(void)
+MapTile::MapTile(void)
 {
 	tileData.x = 0;
 	tileData.y = 0;
@@ -31,7 +31,7 @@ mapTile::mapTile(void)
  * @param id Tile identifier
  * @param texture Pointer to texture
  */
-mapTile::mapTile(int x, int y, tileID id, SDL_Texture * texture)
+MapTile::MapTile(int x, int y, tileID id, SDL_Texture * texture)
 {
 	tileData.x = x;
 	tileData.y = y;
@@ -52,7 +52,7 @@ mapTile::mapTile(int x, int y, tileID id, SDL_Texture * texture)
  * @param w Width in pixels
  * @param id Tile identifier
  */
-void mapTile::setTileData(int x, int y, int h, int w, tileID id)
+void MapTile::setTileData(int x, int y, int h, int w, tileID id)
 {
 	tileData.x = x;
 	tileData.y = y;
@@ -66,7 +66,7 @@ void mapTile::setTileData(int x, int y, int h, int w, tileID id)
 /**
  * Getter for tile identifier
  */
-tileID mapTile::getType(void)
+tileID MapTile::getType(void)
 {
 	return tID;
 }
@@ -74,7 +74,7 @@ tileID mapTile::getType(void)
 /**
  * Getter for tile attributes
  */
-SDL_Rect* mapTile::getTile(void)
+SDL_Rect* MapTile::getTile(void)
 {
 	return &tileData;
 }
@@ -82,7 +82,7 @@ SDL_Rect* mapTile::getTile(void)
 /**
  * Getter for texture pointer
  */
-SDL_Texture* mapTile::getTileTexture(void)
+SDL_Texture* MapTile::getTileTexture(void)
 {
 	return tileTexture;
 }
@@ -94,7 +94,7 @@ SDL_Texture* mapTile::getTileTexture(void)
 /**
  * Destructor
  */
-MapManager::~MapManager(void) 
+Map::~Map(void) 
 {
 	for(int i = 0; i < MAX_TILES; ++i)
 	{
@@ -108,10 +108,10 @@ MapManager::~MapManager(void)
  * 
  * @param txMan Pointer to texture manager
  */
-MapManager::MapManager(TextureManager * txMan) 
+Map::Map(TextureManager * txMan) 
 {	
-	texturePreloader(txMan);
-	levelLoader(1);
+	retrieveTextures(txMan);
+	load(1);
 }
 
 /**
@@ -119,7 +119,7 @@ MapManager::MapManager(TextureManager * txMan)
  * 
  * @param level Indicates which map to load
  */
-void MapManager::levelLoader(int level)
+void Map::load(int level)
 {	
 	std::ifstream mapFile;
 	int tile_type;
@@ -128,7 +128,7 @@ void MapManager::levelLoader(int level)
 	switch (level)
 	{
 		case 1:
-			mapFile.open("maps/levelone.txt");
+			mapFile.open("assets/maps/levelone.txt");
 			break;
  	}
 	gameMap.resize(MAX_TILES);
@@ -142,7 +142,7 @@ void MapManager::levelLoader(int level)
 			for(int j = 0; j < MAX_TILES; ++j)
 			{
 				mapFile >> tile_type;
-				gameMap[i][j] = new mapTile(j * TILE_WIDTH, i * TILE_HEIGHT, textureToTile(tile_type), textureUnloader(tile_type));
+				gameMap[i][j] = new MapTile(j * TILE_WIDTH, i * TILE_HEIGHT, textureToTile(tile_type), getTileTexture(tile_type));
 			}
 		}
 	}
@@ -159,7 +159,7 @@ void MapManager::levelLoader(int level)
  * 
  * @param txMan The texture manager to retrieve textures from
  */
-void MapManager::texturePreloader(TextureManager * txMan)
+void Map::retrieveTextures(TextureManager * txMan)
 { 	
 	mapTextures.resize(3);
 
@@ -175,7 +175,7 @@ void MapManager::texturePreloader(TextureManager * txMan)
  * 
  * @param tile_type Tile identifier
  */
-SDL_Texture* MapManager::textureUnloader(int tile_type)
+SDL_Texture* Map::getTileTexture(int tile_type)
 {
 	return mapTextures[tile_type];
 }
@@ -186,7 +186,7 @@ SDL_Texture* MapManager::textureUnloader(int tile_type)
  * @param player Pointer to the player object
  * @returns False if player is colliding with map edge, wall, or pit
  */
-bool MapManager::mapCollision(Position player)
+bool Map::isPlayerColliding(Position player)
 {
 	if (player.x <= 0 || player.y <= 0 || player.x + 20 >= MAX_TILES * TILE_WIDTH || player.y + 25 >= MAX_TILES * TILE_HEIGHT) 
 		return false;
@@ -219,7 +219,7 @@ bool MapManager::mapCollision(Position player)
  * @param tile_type Texture ID
  * @returns Tile identifier
  */
-tileID MapManager::textureToTile(int tile_type) 
+tileID Map::textureToTile(int tile_type) 
 {
 	tileID tid;
 	switch (tile_type) 
@@ -243,7 +243,7 @@ tileID MapManager::textureToTile(int tile_type)
  * @param texture_type Tile ID
  * @returns Texture identifier
  */
-TextureID MapManager::tileToTexture(int texture_type) 
+TextureID Map::tileToTexture(int texture_type) 
 {
 	TextureID tid;
 	switch (texture_type) {
@@ -265,7 +265,7 @@ TextureID MapManager::tileToTexture(int texture_type)
  * 
  * @param renderer External renderer
  */
-void MapManager::mapDrawer(SDL_Renderer * renderer) 
+void Map::refresh(SDL_Renderer * renderer) 
 {
 	// Loops iterate over map 2D vector
 	for(int i = 0; i < MAX_TILES; ++i)

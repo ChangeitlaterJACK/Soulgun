@@ -4,7 +4,7 @@
  * Distributed under the MIT software license
  */
 
-#include "humanoid.h"
+#include "Humanoid.h"
 
 using namespace std;
 
