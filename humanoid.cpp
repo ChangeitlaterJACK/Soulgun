@@ -53,9 +53,6 @@ Humanoid::Humanoid(int health, EntityType entityType,
     }
 }
 
-// Destructor
-Humanoid::~Humanoid() { }
-
 /**
  * Getter for shoot style
  * 

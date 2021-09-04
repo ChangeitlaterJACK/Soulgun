@@ -12,6 +12,8 @@ using namespace std;
  * Default constructor
  */
 Entity::Entity(void):
+    moveStartTime(0),
+    moveAway(false),
     maxHealth(10),
     health(maxHealth),
     entityType(ET_ROBOT),
@@ -20,9 +22,7 @@ Entity::Entity(void):
     speed(1),
     entityMove(moveLeft),
     projectileMove(moveLeft),
-    textureID(TX_ROBOT),
-    moveStartTime(0),
-    moveAway(false)
+    textureID(TX_ROBOT)
 
 {
 	setHitbox(ET_ROBOT);
@@ -48,9 +48,6 @@ Entity::Entity(const Entity &entity):
     cout << "Created entity from copy." << endl;
 #endif
 }
-
-// Destructor
-Entity::~Entity(void) { }
 
 /**
  * Constructor

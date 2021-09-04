@@ -51,7 +51,6 @@ private:
 
     SDL_Renderer *renderer;
     Humanoid *player;
-    TextureManager *txMan;
 
     TTF_Font *fontNormal;
     TTF_Font *fontBold;

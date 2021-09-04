@@ -30,14 +30,7 @@ DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture
  */
 DisplayManager::~DisplayManager(void) 
 {
-    for (int i = 0; i != entities.size(); ++i) {
-        delete entities[i];
-    }
     entities.clear();
-
-    for (int i = 0; i != projectiles.size(); ++i) {
-        delete projectiles[i];
-    }
     projectiles.clear();
 }
 
@@ -78,7 +71,6 @@ void DisplayManager::addEntity(Humanoid *entity) {
 void DisplayManager::removeEntity(Humanoid *entity) {
     for (int i = 0; i < entities.size(); ++i) {
         if (entities[i] == entity) {
-            delete entity;
             entities.erase(entities.begin() + i);
         }
     }
@@ -159,9 +151,6 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
     }
 
     Position pos = player->getPosition();
-
-    // Have enemies encircle the player
-    float unitCircle = 2 * M_PI;
 
     // initial values and variables
     double x;
@@ -393,7 +382,6 @@ void DisplayManager::addProjectile(Projectile *proj) {
 void DisplayManager::removeProjectile(Projectile *proj) {
     for (int i = 0; i < projectiles.size(); ++i) {
         if (projectiles[i] == proj) {
-            delete proj;
             projectiles.erase(projectiles.begin() + i);
         }
     }
@@ -433,14 +421,8 @@ void DisplayManager::fireEnemies(Humanoid *player)
 void DisplayManager::moveProjectiles(Humanoid *player) {
     Position playerPos = player->getPosition();
     Projectile *p = NULL;
-
-    Movement mov;
-    int direction = 0;
-    Position enemyPos;
     Position projPos;
     double thetaAim;
-
-    int now = SDL_GetTicks();
 
     // Iterate through projectiles
     for (int i = 0; i < projectiles.size(); ++i) 

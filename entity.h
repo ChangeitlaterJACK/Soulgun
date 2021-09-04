@@ -31,7 +31,6 @@ public:
             moveProjectileFunc projectileMove,
             TextureID textureID);
     Entity& operator=(const Entity &entity);
-    ~Entity();
 
     int getHealth(void);
     Position getPosition(void);

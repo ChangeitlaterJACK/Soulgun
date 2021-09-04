@@ -47,7 +47,6 @@ public:
                 double x, double y, double speed, moveEntityFunc entityMove, 
                 int shootCooldown, ShootStyle shootStyle, moveProjectileFunc projectileMove, 
                 TextureID textureID);
-    ~Humanoid();
 
     void move(Movement &dir);
     std::vector<Projectile*> shoot(double targetx, double targety, bool soulBullet);
