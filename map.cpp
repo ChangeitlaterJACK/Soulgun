@@ -110,8 +110,15 @@ Map::~Map(void)
  */
 Map::Map(TextureManager * txMan) 
 {	
-	retrieveTextures(txMan);
-	load(1);
+	mapTextures.resize(3);
+
+	// Preloads texture set
+	for(int i = 0; i < 3; ++i)
+	{
+		mapTextures[i] = txMan->getTexture(tileToTexture(i));
+	}
+
+	loadLevel(1);
 }
 
 /**
@@ -119,7 +126,7 @@ Map::Map(TextureManager * txMan)
  * 
  * @param level Indicates which map to load
  */
-void Map::load(int level)
+void Map::loadLevel(int level)
 {	
 	std::ifstream mapFile;
 	int tile_type;
@@ -153,23 +160,6 @@ void Map::load(int level)
 
 	mapFile.close(); 
 }
-
-/**
- * Loads map texture pointers
- * 
- * @param txMan The texture manager to retrieve textures from
- */
-void Map::retrieveTextures(TextureManager * txMan)
-{ 	
-	mapTextures.resize(3);
-
-	// Preloads texture set
-	for(int i = 0; i < 3; ++i)
-	{
-		mapTextures[i] = txMan->getTexture(tileToTexture(i));
-	}
-}
-
 /**
  * Retrieves a map texture
  * 
@@ -188,6 +178,8 @@ SDL_Texture* Map::getTileTexture(int tile_type)
  */
 bool Map::isPlayerColliding(Position player)
 {
+	// TO-DO: Calculate camera offset for both tiles and player
+
 	if (player.x <= 0 || player.y <= 0 || player.x + 20 >= MAX_TILES * TILE_WIDTH || player.y + 25 >= MAX_TILES * TILE_HEIGHT) 
 		return false;
 
@@ -221,6 +213,7 @@ bool Map::isPlayerColliding(Position player)
  */
 tileID Map::textureToTile(int tile_type) 
 {
+	// TO-DO: Remove function, store tile id in object itself
 	tileID tid;
 	switch (tile_type) 
 	{
@@ -245,6 +238,7 @@ tileID Map::textureToTile(int tile_type)
  */
 TextureID Map::tileToTexture(int texture_type) 
 {
+	// TO-DO: Remove function, store texture id in object itself
 	TextureID tid;
 	switch (texture_type) {
 		case 0:
@@ -267,6 +261,9 @@ TextureID Map::tileToTexture(int texture_type)
  */
 void Map::refresh(SDL_Renderer * renderer) 
 {
+	// TO-DO: Only render tiles that are visible
+	// Calculate camera offset position before SDL_RenderCopy
+
 	// Loops iterate over map 2D vector
 	for(int i = 0; i < MAX_TILES; ++i)
 	{

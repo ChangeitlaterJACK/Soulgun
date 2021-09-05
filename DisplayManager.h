@@ -16,9 +16,8 @@
 // Distance enemies will spawn away from the player
 #define SPAWN_DIST 350
 
-#define MAP_WIDTH 1024
-#define MAP_HEIGHT 1024
-
+#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH 1024
 /**
  * Manages entities and where textures are drawn on-screen
  */
@@ -28,14 +27,14 @@ public:
     DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, Map *map);
     ~DisplayManager(void);
 
-		void updateWindowPos(Position window_focus);
+    Position getCameraOffset(Position window_focus, Position absPos);
 
     void spawnEnemies(Map *map);
-    Humanoid *spawnHumanoid(Map *map, EntityType type, Humanoid *player = NULL);
-    void moveEnemies(Map *map, Humanoid *player = NULL);
+    Humanoid *spawnHumanoid(Map *map, EntityType type);
+    void moveEnemies(Map *map);
     bool isNearEnemy(int x, int y, int proximity);
-    void fireEnemies(Humanoid *player = NULL);
-    void moveProjectiles(Humanoid *player = NULL);
+    void fireEnemies(void);
+    void moveProjectiles(void);
 
     void addEntity(Humanoid *entity);
     void removeEntity(Humanoid *entity);
@@ -58,4 +57,5 @@ private:
     int newSpawnCooldown;
     int maxSpawnCooldown;
     bool firstSpawn;
+    Humanoid *player;
 };

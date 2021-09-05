@@ -53,8 +53,7 @@ public:
 	Map(TextureManager * txMan);
 	~Map(void);
 	
-	void load(int level);
-	void retrieveTextures(TextureManager * txMan); 
+	void loadLevel(int level);
 	SDL_Texture* getTileTexture(int tile_type);
 	bool isPlayerColliding(Position player);
 

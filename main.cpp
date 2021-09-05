@@ -12,8 +12,6 @@
 #include "HUD.h"
 
 #define REFRESH_RATE 15
-#define WINDOW_HEIGHT 1024
-#define WINDOW_WIDTH 1024
 
 using namespace std;
 
@@ -63,7 +61,6 @@ int main (int argc, char **argv) {
 		if (map->isPlayerColliding(player->testMove(movement)))
 		{
 			player->move(movement);
-			dispMan.updateWindowPos(player->getPosition());
 		}
 
 		// Wait for refresh delay
@@ -76,10 +73,11 @@ int main (int argc, char **argv) {
 		
 		// Respawn and recalculate entity positions
 		dispMan.spawnEnemies(map);
-		dispMan.moveEnemies(map, player);
-		dispMan.fireEnemies(player);
-		dispMan.moveProjectiles(player);
+		dispMan.moveEnemies(map);
+		dispMan.fireEnemies();
+		dispMan.moveProjectiles();
 
+		// TO-DO Fix game over screen
         // Game Over screen
         if(player->damage(0)){
             SDL_DestroyRenderer(renderer);
@@ -94,7 +92,7 @@ int main (int argc, char **argv) {
 
 		// Redraw entities on screen
 		dispMan.refresh();
-		hud->refresh();
+		//hud->refresh();
 		SDL_RenderPresent(renderer);
 	}
 

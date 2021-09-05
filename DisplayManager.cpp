@@ -6,6 +6,8 @@
 
 #include "DisplayManager.h"
 
+// TO-DO: Turn into Entity Manager and move drawing functions elsewhere
+
 /**
  * Initializes the display manager
  *
@@ -38,20 +40,30 @@ DisplayManager::~DisplayManager(void)
  * Pan the camera as player moves
  * 
  * @param window_focus The coordinates that the camera is focusing on
+ * @param absPos Absolute position
+ * @returns Position relative to window and focal point
  */
-void DisplayManager::updateWindowPos(Position window_focus)
+Position DisplayManager::getCameraOffset(Position window_focus, Position absPos)
 {
-    point_of_view.h = 5000;
-    point_of_view.w = 5000;
+    Position offset = { 0, 0 };
+    Position result = { 0, 0 };
 
-    // Move unless camera is going beyond the edge of the map 
-    if (window_focus.x >= 512 && window_focus.x <= MAX_TILES * TILE_WIDTH - 512)
-        point_of_view.x = 512 - window_focus.x;
+    // Focal point will be in center of window
+    int winX = WINDOW_WIDTH / 2;
+    int winY = WINDOW_HEIGHT / 2;
 
-    if (window_focus.y >= 512 && window_focus.y <= MAX_TILES * TILE_HEIGHT - 512)
-        point_of_view.y = 512 - window_focus.y;
+    // Calculate offset relative to focal point
+    if (window_focus.x >= winX && window_focus.x <= MAX_TILES * TILE_WIDTH - winX)
+        offset.x = winX - window_focus.x;
 
-    SDL_RenderSetViewport(renderer, &point_of_view);
+    if (window_focus.y >= winY && window_focus.y <= MAX_TILES * TILE_HEIGHT - winY)
+        offset.y = winY - window_focus.y;
+
+    // Modify position
+    result.x = absPos.x + offset.x;
+    result.y = absPos.y + offset.y;
+
+    return result;
 }
 
 /**
@@ -82,7 +94,6 @@ void DisplayManager::removeEntity(Humanoid *entity) {
 void DisplayManager::spawnEnemies(Map *map) {
     int humans = 0;
     int robots = 0;
-    Humanoid *player = NULL;
 
     for (int i = 0; i < entities.size(); ++i) {
         Humanoid *e = entities[i];
@@ -94,7 +105,6 @@ void DisplayManager::spawnEnemies(Map *map) {
                 ++robots;
             break;
             case ET_PLAYER:
-                player = (e);
             break;
             case ET_PROJECTILE:
             break;
@@ -115,9 +125,9 @@ void DisplayManager::spawnEnemies(Map *map) {
     if (newSpawnCooldown <= 0)
     {
         if (rand() % 4 > 0)
-            spawnHumanoid(map, ET_ROBOT, player);
+            spawnHumanoid(map, ET_ROBOT);
         else if (!firstSpawn)
-            spawnHumanoid(map, ET_HUMAN, player);
+            spawnHumanoid(map, ET_HUMAN);
 
         newSpawnCooldown = maxSpawnCooldown;
         maxSpawnCooldown -= 15;
@@ -139,17 +149,14 @@ void DisplayManager::spawnEnemies(Map *map) {
  * @param player Pointer to the player
  * @returns A pointer to the humanoid spawned
  */
-Humanoid *DisplayManager::spawnHumanoid(Map *map, EntityType type, Humanoid *player) {
+Humanoid *DisplayManager::spawnHumanoid(Map *map, EntityType type) {
     // Place player at center of map
     if (type == ET_PLAYER) {
-
-	    player = new Humanoid(5, ET_PLAYER, MAP_WIDTH / 2, MAP_HEIGHT / 2, 2, movePlayer, 50, SS_SINGLESHOT, moveDirection, TX_PLAYER);
-
+	    player = new Humanoid(5, ET_PLAYER, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 2, movePlayer, 50, SS_SINGLESHOT, moveDirection, TX_PLAYER);
 
         addEntity(player);
         return player;
     }
-
     Position pos = player->getPosition();
 
     // initial values and variables
@@ -172,7 +179,7 @@ Humanoid *DisplayManager::spawnHumanoid(Map *map, EntityType type, Humanoid *pla
     newPos.y = y;
     while (!(map->isPlayerColliding(newPos)))
     {
-    		theta = (rand() % 628)*0.01;
+    	theta = (rand() % 628)*0.01;
         x = pos.x + cos(theta) * SPAWN_DIST;
         y = pos.y + sin(theta) * SPAWN_DIST;
         newPos.x = x;
@@ -246,7 +253,7 @@ Humanoid *DisplayManager::spawnHumanoid(Map *map, EntityType type, Humanoid *pla
  *
  * @param player Pointer to the player
  */
-void DisplayManager::moveEnemies(Map *map, Humanoid *player) {
+void DisplayManager::moveEnemies(Map *map) {
     Position playerPos = player->getPosition();
     Humanoid *h = NULL;
 
@@ -392,7 +399,7 @@ void DisplayManager::removeProjectile(Projectile *proj) {
  * 
  * @param player Pointer to the player
  */
-void DisplayManager::fireEnemies(Humanoid *player)
+void DisplayManager::fireEnemies()
 {
     Position playerPos = player->getPosition();
     int posx = playerPos.x;
@@ -418,7 +425,7 @@ void DisplayManager::fireEnemies(Humanoid *player)
  * 
  * @param player Pointer to the player
  */
-void DisplayManager::moveProjectiles(Humanoid *player) {
+void DisplayManager::moveProjectiles() {
     Position playerPos = player->getPosition();
     Projectile *p = NULL;
     Position projPos;
@@ -493,7 +500,7 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        Position pos = e->getPosition();
+        Position pos = getCameraOffset(player->getPosition(), e->getPosition());
         position.x  = pos.x;
         position.y  = pos.y;
 
@@ -509,7 +516,7 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        Position pos = p->getPosition();
+        Position pos = getCameraOffset(player->getPosition(), p->getPosition());
         position.x  = pos.x;
         position.y  = pos.y;
 
@@ -555,8 +562,8 @@ void DisplayManager::flashScreen(){
     SDL_Rect box;
     box.x = 0;
     box.y = 0;
-    box.w = MAP_WIDTH;
-    box.h = MAP_HEIGHT;
+    box.w = WINDOW_WIDTH;
+    box.h = WINDOW_HEIGHT;
 
     SDL_RenderFillRect(renderer, &box);
     SDL_RenderPresent(renderer);
