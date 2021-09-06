@@ -572,9 +572,6 @@ void DisplayManager::refreshMap()
 			rect.x = newPos.x;
 			rect.y = newPos.y;
 
-
-    printf("%d, %d\n", rect.x, rect.y);
-
 			SDL_RenderCopy(renderer, tile->getTileTexture(), NULL, &rect);
 		}
 	}
