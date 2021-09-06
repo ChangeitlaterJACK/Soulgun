@@ -50,6 +50,14 @@ int main (int argc, char **argv) {
 
 		SDL_RenderClear(renderer);
 
+		// Game Over screen
+        if(player->damage(0)){
+            SDL_RenderCopy(renderer, txMan->getTexture(TX_GAMEOVER), NULL, NULL);
+            SDL_RenderPresent(renderer);
+            SDL_Delay(5000);
+            break;
+        }
+
 		// Interpret event
 		if (eventFinder(event, movement))
 		{
@@ -77,22 +85,11 @@ int main (int argc, char **argv) {
 		dispMan.fireEnemies();
 		dispMan.moveProjectiles();
 
-		// TO-DO Fix game over screen
-        // Game Over screen
-        if(player->damage(0)){
-            SDL_DestroyRenderer(renderer);
-            SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
-            SDL_Texture *gtext = IMG_LoadTexture(renderer, "assets/images/game_over.png");
-
-            SDL_RenderCopy(renderer, gtext, NULL, NULL);
-            SDL_RenderPresent(renderer);
-            SDL_Delay(2000);
-            break;
-        }
 
 		// Redraw entities on screen
 		dispMan.refreshEntities();
 		hud->refreshEntities();
+
 		SDL_RenderPresent(renderer);
 	}
 
