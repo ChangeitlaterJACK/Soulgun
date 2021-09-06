@@ -52,6 +52,9 @@ void HUD::refresh(void) {
         lastX = renderText("Time: ", true, lastX + TEXT_GAP);
         lastX = renderText(time, false, lastX);
 
+        lastX = renderText("Score: ", true, lastX + TEXT_GAP);
+        lastX = renderText(std::to_string(player->getScore()), false, lastX);
+
         lastX = renderText("Health: ", true, lastX + TEXT_GAP);
         lastX = renderText(std::to_string(player->getHealth()), false, lastX);
     }
