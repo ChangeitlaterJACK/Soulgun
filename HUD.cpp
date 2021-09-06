@@ -13,7 +13,7 @@
  * @param player Pointer to player object
  * @param txMan Pointer to texture manager
  */
-HUD::HUD(SDL_Renderer *renderer, Humanoid *player, TextureManager *txMan): renderer(renderer), txMan(txMan), player(player), lastTime(0), elapsedTime(0), isPaused(false) {
+HUD::HUD(SDL_Renderer *renderer, Humanoid *player, TextureManager *txMan): lastTime(0), elapsedTime(0), isPaused(false), renderer(renderer), player(player), fontNormal(NULL), fontBold(NULL) {
     fontBold = TTF_OpenFont("assets/fonts/Courier New Bold.ttf", FONT_SIZE);
     fontNormal = TTF_OpenFont("assets/fonts/Courier New.ttf", FONT_SIZE);
 }
@@ -31,7 +31,7 @@ HUD::~HUD(void) {
 /**
  * Redaw player info and timer
  */
-void HUD::refresh(void) {
+void HUD::refreshEntities(void) {
     int lastX = 0;
 
     if (!isPaused) {

@@ -8,7 +8,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include "humanoid.h"
+#include "Humanoid.h"
 #include "TextureManager.h"
 #include <string.h>
 
@@ -22,10 +22,10 @@
 
 // Makes storing parts of time string easier
 struct TimeUnits {
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-    int ms = 0;
+    int hours;
+    int minutes;
+    int seconds;
+    int ms;
 };
 
 /**
@@ -36,7 +36,7 @@ class HUD
 public:
     HUD(SDL_Renderer *renderer, Humanoid *player, TextureManager *txMan);
     ~HUD(void);
-    void refresh(void);
+    void refreshEntities(void);
 
     void startTimer(void);
     void stopTimer(void);
@@ -51,7 +51,6 @@ private:
 
     SDL_Renderer *renderer;
     Humanoid *player;
-    TextureManager *txMan;
 
     TTF_Font *fontNormal;
     TTF_Font *fontBold;

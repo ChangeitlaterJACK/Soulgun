@@ -6,6 +6,8 @@
 
 #include "DisplayManager.h"
 
+// TO-DO: Turn into Entity Manager and move drawing functions elsewhere
+
 /**
  * Initializes the display manager
  *
@@ -13,7 +15,7 @@
  * @param xTexture External texture manager
  * @param map Pointer to the map object
  */
-DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, MapManager *map) 
+DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, Map *map) 
 {
     renderer = xRenderer;
     txMan = xTexture;
@@ -30,35 +32,37 @@ DisplayManager::DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture
  */
 DisplayManager::~DisplayManager(void) 
 {
-    for (int i = 0; i != entities.size(); ++i) {
-        delete entities[i];
-    }
     entities.clear();
-
-    for (int i = 0; i != projectiles.size(); ++i) {
-        delete projectiles[i];
-    }
     projectiles.clear();
 }
 
 /**
- * Pan the camera as player moves
+ * Convert an absolute position on the map to a position relative to what is being rendered on the window
  * 
- * @param window_focus The coordinates that the camera is focusing on
+ * @param absPos Absolute position on map
+ * @returns Position relative to window and focal point
  */
-void DisplayManager::updateWindowPos(Position window_focus)
+Position DisplayManager::applyCameraOffset(Position absPos)
 {
-    point_of_view.h = 5000;
-    point_of_view.w = 5000;
+    Position offset = { 0, 0 };
+    Position result = { 0, 0 };
 
-    // Move unless camera is going beyond the edge of the map 
-    if (window_focus.x >= 512 && window_focus.x <= MAX_TILES * TILE_WIDTH - 512)
-        point_of_view.x = 512 - window_focus.x;
+    // Focal point will be the player in the center of the window
+    Position window_focus = player->getPosition();
+    double winX = WINDOW_WIDTH / 2;
+    double winY = WINDOW_HEIGHT / 2;
 
-    if (window_focus.y >= 512 && window_focus.y <= MAX_TILES * TILE_HEIGHT - 512)
-        point_of_view.y = 512 - window_focus.y;
+    // Calculate offset relative to focal point, unless too close to edge of map
+    if (window_focus.x >= winX)
+        offset.x = winX - window_focus.x;
+    if (window_focus.y >= winY)
+        offset.y = winY - window_focus.y;
 
-    SDL_RenderSetViewport(renderer, &point_of_view);
+    // Apply offset
+    result.x = absPos.x + offset.x;
+    result.y = absPos.y + offset.y;
+
+    return result;
 }
 
 /**
@@ -78,7 +82,6 @@ void DisplayManager::addEntity(Humanoid *entity) {
 void DisplayManager::removeEntity(Humanoid *entity) {
     for (int i = 0; i < entities.size(); ++i) {
         if (entities[i] == entity) {
-            delete entity;
             entities.erase(entities.begin() + i);
         }
     }
@@ -87,10 +90,9 @@ void DisplayManager::removeEntity(Humanoid *entity) {
 /**
  * Spawns enemies as needed
  */
-void DisplayManager::spawnEnemies(MapManager *map) {
+void DisplayManager::spawnEnemies(Map *map) {
     int humans = 0;
     int robots = 0;
-    Humanoid *player = NULL;
 
     for (int i = 0; i < entities.size(); ++i) {
         Humanoid *e = entities[i];
@@ -102,7 +104,8 @@ void DisplayManager::spawnEnemies(MapManager *map) {
                 ++robots;
             break;
             case ET_PLAYER:
-                player = (e);
+            break;
+            case ET_PROJECTILE:
             break;
         }
     }
@@ -121,9 +124,9 @@ void DisplayManager::spawnEnemies(MapManager *map) {
     if (newSpawnCooldown <= 0)
     {
         if (rand() % 4 > 0)
-            spawnHumanoid(map, ET_ROBOT, player);
+            spawnHumanoid(map, ET_ROBOT);
         else if (!firstSpawn)
-            spawnHumanoid(map, ET_HUMAN, player);
+            spawnHumanoid(map, ET_HUMAN);
 
         newSpawnCooldown = maxSpawnCooldown;
         maxSpawnCooldown -= 15;
@@ -145,21 +148,15 @@ void DisplayManager::spawnEnemies(MapManager *map) {
  * @param player Pointer to the player
  * @returns A pointer to the humanoid spawned
  */
-Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humanoid *player) {
+Humanoid *DisplayManager::spawnHumanoid(Map *map, EntityType type) {
     // Place player at center of map
     if (type == ET_PLAYER) {
-
-	    player = new Humanoid(5, ET_PLAYER, MAP_WIDTH / 2, MAP_HEIGHT / 2, 2, movePlayer, 50, SS_SINGLESHOT, moveDirection, TX_PLAYER);
-
+	    player = new Humanoid(5, ET_PLAYER, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 2, movePlayer, 50, SS_SINGLESHOT, moveDirection, TX_PLAYER);
 
         addEntity(player);
         return player;
     }
-
     Position pos = player->getPosition();
-
-    // Have enemies encircle the player
-    float unitCircle = 2 * M_PI;
 
     // initial values and variables
     double x;
@@ -179,9 +176,9 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
     y = pos.y + sin(theta) * SPAWN_DIST;
     newPos.x = x;
     newPos.y = y;
-    while (!(map->mapCollision(newPos)))
+    while (!(map->isPlayerColliding(newPos)))
     {
-    		theta = (rand() % 628)*0.01;
+    	theta = (rand() % 628)*0.01;
         x = pos.x + cos(theta) * SPAWN_DIST;
         y = pos.y + sin(theta) * SPAWN_DIST;
         newPos.x = x;
@@ -255,7 +252,7 @@ Humanoid *DisplayManager::spawnHumanoid(MapManager *map, EntityType type, Humano
  *
  * @param player Pointer to the player
  */
-void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
+void DisplayManager::moveEnemies(Map *map) {
     Position playerPos = player->getPosition();
     Humanoid *h = NULL;
 
@@ -294,10 +291,10 @@ void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
                     }
                     mov.down = !mov.up;
                     mov.left = !mov.right;
-                    if (map->mapCollision(h->testMove(mov)))
+                    if (map->isPlayerColliding(h->testMove(mov)))
                         h->move(mov);
                 }
-                else if (map->mapCollision(h->testMove(mov)))
+                else if (map->isPlayerColliding(h->testMove(mov)))
                 {
                     h->move(h->moveDirection);
                 }
@@ -338,12 +335,16 @@ void DisplayManager::moveEnemies(MapManager *map, Humanoid *player) {
                         mov.left = false;
                         mov.right = false;
                     }
-                    if (map->mapCollision(h->testMove(mov)))
+                    if (map->isPlayerColliding(h->testMove(mov)))
                         h->move(mov);
                 }
-                else if (map->mapCollision(h->testMove(mov))) {
+                else if (map->isPlayerColliding(h->testMove(mov))) {
                     h->move(h->moveDirection);
                 }
+            break;
+            case ET_PLAYER:
+            case ET_PROJECTILE:
+            default:
             break;
         }
     }
@@ -387,7 +388,6 @@ void DisplayManager::addProjectile(Projectile *proj) {
 void DisplayManager::removeProjectile(Projectile *proj) {
     for (int i = 0; i < projectiles.size(); ++i) {
         if (projectiles[i] == proj) {
-            delete proj;
             projectiles.erase(projectiles.begin() + i);
         }
     }
@@ -398,7 +398,7 @@ void DisplayManager::removeProjectile(Projectile *proj) {
  * 
  * @param player Pointer to the player
  */
-void DisplayManager::fireEnemies(Humanoid *player)
+void DisplayManager::fireEnemies()
 {
     Position playerPos = player->getPosition();
     int posx = playerPos.x;
@@ -424,17 +424,11 @@ void DisplayManager::fireEnemies(Humanoid *player)
  * 
  * @param player Pointer to the player
  */
-void DisplayManager::moveProjectiles(Humanoid *player) {
+void DisplayManager::moveProjectiles() {
     Position playerPos = player->getPosition();
     Projectile *p = NULL;
-
-    Movement mov;
-    int direction = 0;
-    Position enemyPos;
     Position projPos;
     double thetaAim;
-
-    int now = SDL_GetTicks();
 
     // Iterate through projectiles
     for (int i = 0; i < projectiles.size(); ++i) 
@@ -471,11 +465,11 @@ void DisplayManager::moveProjectiles(Humanoid *player) {
                         removeProjectile(p);
                     }
                 }
-                else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
+                else if (p->move(thetaAim) || !renderMap->isPlayerColliding(p->getPosition()))
                     removeProjectile(p);
             }
         }
-      	else if (p->move(thetaAim) || !renderMap->mapCollision(p->getPosition()))
+      	else if (p->move(thetaAim) || !renderMap->isPlayerColliding(p->getPosition()))
         {
             removeProjectile(p);
         }
@@ -485,7 +479,7 @@ void DisplayManager::moveProjectiles(Humanoid *player) {
 /**
  * Draws textures on the window where they are currently located
  */
-void DisplayManager::refresh(void) {
+void DisplayManager::refreshEntities(void) {
     // Put textures on screen
     SDL_Rect position;
     SDL_Point size;
@@ -494,7 +488,7 @@ void DisplayManager::refresh(void) {
     Projectile *p;
 
     // Render map
-	renderMap->mapDrawer(renderer);
+	refreshMap();
 
     // Render entities
     for (int i = 0; i < entities.size(); ++i) {
@@ -505,7 +499,7 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        Position pos = e->getPosition();
+        Position pos = applyCameraOffset(e->getPosition());
         position.x  = pos.x;
         position.y  = pos.y;
 
@@ -521,12 +515,69 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        Position pos = p->getPosition();
+        Position pos = applyCameraOffset(p->getPosition());
         position.x  = pos.x;
         position.y  = pos.y;
 
         SDL_RenderCopy(renderer, texture, NULL, &position);
     }
+}
+
+/**
+ * Draws tiles onto the map
+ */
+void DisplayManager::refreshMap() 
+{
+    Position pos = player->getPosition();
+    int tilesX = WINDOW_WIDTH / TILE_WIDTH; // Total horizontal tiles per window
+    int tilesY = WINDOW_HEIGHT / TILE_HEIGHT; // Total vertical tiles per window
+
+    // To-Do: This index math could probably be streamlined
+    // Determine which tile indices to start and end drawing
+    int startX = (pos.x - (WINDOW_WIDTH / 2)) / TILE_WIDTH;
+    int startY = (pos.y - (WINDOW_HEIGHT / 2)) / TILE_HEIGHT;
+    
+    int endX = (pos.x + (WINDOW_WIDTH / 2)) / TILE_WIDTH;
+    int endY = (pos.y + (WINDOW_HEIGHT / 2)) / TILE_HEIGHT;
+    ++endX;
+    ++endY;
+
+    // If player is close to edge of map, make indices fill out the window
+    if (endX < tilesX) endX = tilesX + 1;
+    if (endY < tilesY) endY = tilesY + 1;
+
+    int tileGapX = endX - startX;
+    int tileGapY = endY - startY;
+
+    if (tileGapX < tilesX) startX = endX - tilesX;
+    if (tileGapY < tilesY) startY = endY - tilesY;
+    
+    // Enforce max index bounds
+    if (startX < 0) startX = 0;
+    if (startY < 0) startY = 0;
+
+    if (endX > MAX_TILES) endX = MAX_TILES;
+    if (endY > MAX_TILES) endY = MAX_TILES;
+    
+	// Loops iterate over map 2D vector
+	for (int i = startY; i < endY; ++i)
+	{
+		for (int j = startX; j < endX; ++j)
+		{
+            MapTile *tile = renderMap->getTile(i, j);
+			SDL_Rect rect = tile->getRect();
+            
+			Position tilePos = { rect.x, rect.y };
+			Position newPos = applyCameraOffset(tilePos);
+			rect.x = newPos.x;
+			rect.y = newPos.y;
+
+
+    printf("%d, %d\n", rect.x, rect.y);
+
+			SDL_RenderCopy(renderer, tile->getTileTexture(), NULL, &rect);
+		}
+	}
 }
 
 /**
@@ -567,8 +618,8 @@ void DisplayManager::flashScreen(){
     SDL_Rect box;
     box.x = 0;
     box.y = 0;
-    box.w = MAP_WIDTH;
-    box.h = MAP_HEIGHT;
+    box.w = WINDOW_WIDTH;
+    box.h = WINDOW_HEIGHT;
 
     SDL_RenderFillRect(renderer, &box);
     SDL_RenderPresent(renderer);

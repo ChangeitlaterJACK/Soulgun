@@ -28,10 +28,10 @@ struct Position
 // Defines movement for cardinal directions
 struct Movement
 {
-    bool left = false;
-    bool down = false;
-    bool up = false;
-    bool right = false;
+    bool left;
+    bool down;
+    bool up;
+    bool right;
 };
 
 // Converting from cardinal directions to angles and vice-versa

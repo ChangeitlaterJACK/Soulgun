@@ -15,6 +15,16 @@ TextureManager::TextureManager(SDL_Renderer *xRenderer)
 {
     renderer = xRenderer;
 
+    int i = 0;
+    paths[i++] = "assets/images/openmoji-player.png";
+    paths[i++] = "assets/images/openmoji-robot.png";
+    paths[i++] = "assets/images/openmoji-human.png";
+    paths[i++] = "assets/images/placeholder-bullet.png";
+    paths[i++] = "assets/images/placeholder-terrain.png";
+    paths[i++] = "assets/images/placeholder-wall.png";
+    paths[i++] = "assets/images/placeholder-pit.png";
+    paths[i++] = "assets/images/game_over.png";
+
     for (int id = 0; id < TX_TOTAL; ++id)
     {
         textures[id] = NULL;

@@ -5,15 +5,13 @@
 #endif //LAB
 
 #include <iostream>
-#include "map.h"
-#include "humanoid.h"
+#include "Map.h"
+#include "Humanoid.h"
 #include "TextureManager.h"
 #include "DisplayManager.h"
 #include "HUD.h"
 
 #define REFRESH_RATE 15
-#define WINDOW_HEIGHT 1024
-#define WINDOW_WIDTH 1024
 
 using namespace std;
 
@@ -34,7 +32,7 @@ int main (int argc, char **argv) {
 
 	// Create all of the objects for the game engine
 	TextureManager *txMan = new TextureManager(renderer);
-	MapManager *map = new MapManager(txMan);
+	Map *map = new Map(txMan);
 	DisplayManager dispMan(renderer, txMan, map);
 	vector<Projectile*> playerShots;
 	Humanoid *player = dispMan.spawnHumanoid(map, ET_PLAYER);
@@ -60,13 +58,12 @@ int main (int argc, char **argv) {
 				dispMan.addProjectile(playerShots[i]);
 		}
 
-		if (map->mapCollision(player->testMove(movement)))
+		if (map->isPlayerColliding(player->testMove(movement)))
 		{
 			player->move(movement);
-			dispMan.updateWindowPos(player->getPosition());
 		}
 
-		// Wait for refresh delay
+		// Wait for refreshEntities delay
 		int now = SDL_GetTicks();
 		if (now < nextRefresh)
 			SDL_Delay(nextRefresh - now);
@@ -76,10 +73,11 @@ int main (int argc, char **argv) {
 		
 		// Respawn and recalculate entity positions
 		dispMan.spawnEnemies(map);
-		dispMan.moveEnemies(map, player);
-		dispMan.fireEnemies(player);
-		dispMan.moveProjectiles(player);
+		dispMan.moveEnemies(map);
+		dispMan.fireEnemies();
+		dispMan.moveProjectiles();
 
+		// TO-DO Fix game over screen
         // Game Over screen
         if(player->damage(0)){
             SDL_DestroyRenderer(renderer);
@@ -93,8 +91,8 @@ int main (int argc, char **argv) {
         }
 
 		// Redraw entities on screen
-		dispMan.refresh();
-		hud->refresh();
+		dispMan.refreshEntities();
+		hud->refreshEntities();
 		SDL_RenderPresent(renderer);
 	}
 

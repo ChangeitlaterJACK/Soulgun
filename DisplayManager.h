@@ -5,9 +5,9 @@
  */
 
 #pragma once
-#include "map.h"
+#include "Map.h"
 #include "TextureManager.h"
-#include "humanoid.h"
+#include "Humanoid.h"
 #include <vector>
 #include <math.h>
 #include <stdlib.h>
@@ -16,32 +16,32 @@
 // Distance enemies will spawn away from the player
 #define SPAWN_DIST 350
 
-#define MAP_WIDTH 1024
-#define MAP_HEIGHT 1024
-
+#define WINDOW_HEIGHT 1024
+#define WINDOW_WIDTH 1024
 /**
  * Manages entities and where textures are drawn on-screen
  */
 class DisplayManager
 {
 public:
-    DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, MapManager *map);
+    DisplayManager(SDL_Renderer *xRenderer, TextureManager *xTexture, Map *map);
     ~DisplayManager(void);
 
-		void updateWindowPos(Position window_focus);
+    Position applyCameraOffset(Position absPos);
 
-    void spawnEnemies(MapManager *map);
-    Humanoid *spawnHumanoid(MapManager *map, EntityType type, Humanoid *player = NULL);
-    void moveEnemies(MapManager *map, Humanoid *player = NULL);
+    void spawnEnemies(Map *map);
+    Humanoid *spawnHumanoid(Map *map, EntityType type);
+    void moveEnemies(Map *map);
     bool isNearEnemy(int x, int y, int proximity);
-    void fireEnemies(Humanoid *player = NULL);
-    void moveProjectiles(Humanoid *player = NULL);
+    void fireEnemies(void);
+    void moveProjectiles(void);
 
     void addEntity(Humanoid *entity);
     void removeEntity(Humanoid *entity);
     void addProjectile(Projectile *proj);
     void removeProjectile(Projectile *proj);
-    void refresh(void);
+    void refreshEntities(void);
+    void refreshMap(void); 
 
     void flashBox(int startx, int starty, int Width, int Height);
     void flashScreen(void);
@@ -50,12 +50,12 @@ public:
 private:
     std::vector<Humanoid *> entities;
     std::vector<Projectile *> projectiles;
-		SDL_Rect point_of_view;
     SDL_Renderer *renderer;
-		MapManager *renderMap;
+		Map *renderMap;
     TextureManager *txMan;
 
     int newSpawnCooldown;
     int maxSpawnCooldown;
     bool firstSpawn;
+    Humanoid *player;
 };

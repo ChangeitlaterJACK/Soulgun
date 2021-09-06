@@ -4,7 +4,7 @@
  * Distributed under the MIT software license
  */
 
-#include "entity.h"
+#include "Entity.h"
 
 using namespace std;
 
@@ -12,6 +12,8 @@ using namespace std;
  * Default constructor
  */
 Entity::Entity(void):
+    moveStartTime(0),
+    moveAway(false),
     maxHealth(10),
     health(maxHealth),
     entityType(ET_ROBOT),
@@ -20,9 +22,7 @@ Entity::Entity(void):
     speed(1),
     entityMove(moveLeft),
     projectileMove(moveLeft),
-    textureID(TX_ROBOT),
-    moveStartTime(0),
-    moveAway(false)
+    textureID(TX_ROBOT)
 
 {
 	setHitbox(ET_ROBOT);
@@ -32,25 +32,22 @@ Entity::Entity(void):
 }
 
 // Copy constructor
-Entity::Entity(const Entity &entity) :
-    maxHealth(maxHealth),
-    health(maxHealth),
+Entity::Entity(const Entity &entity):
+    maxHealth(entity.maxHealth),
+    health(entity.maxHealth),
     entityType(ET_PLAYER),
-    posx(posx),
-    posy(posy),
-    speed(speed),
-    entityMove(entityMove),
-    projectileMove(projectileMove),
-    textureID(textureID)
+    posx(entity.posx),
+    posy(entity.posy),
+    speed(entity.speed),
+    entityMove(entity.entityMove),
+    projectileMove(entity.projectileMove),
+    textureID(entity.textureID)
 {
 	setHitbox(entityType);
 #ifdef ENTITYDEBUG
     cout << "Created entity from copy." << endl;
 #endif
 }
-
-// Destructor
-Entity::~Entity(void) { }
 
 /**
  * Constructor

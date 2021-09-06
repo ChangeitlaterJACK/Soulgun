@@ -4,7 +4,7 @@
  * Distributed under the MIT software license
  */
 
-#include "humanoid.h"
+#include "Humanoid.h"
 
 using namespace std;
 
@@ -21,8 +21,8 @@ Humanoid::Humanoid() :
 Humanoid::Humanoid(const Humanoid &humanoid):
     Entity(humanoid),
     shootCooldown(100),
-    shootTimer(shootCooldown),
-    shootStyle(shootStyle)
+    shootTimer(humanoid.shootCooldown),
+    shootStyle(humanoid.shootStyle)
 {
 }
 
@@ -52,9 +52,6 @@ Humanoid::Humanoid(int health, EntityType entityType,
         shootCooldown = 367;
     }
 }
-
-// Destructor
-Humanoid::~Humanoid() { }
 
 /**
  * Getter for shoot style
