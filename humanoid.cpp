@@ -9,11 +9,12 @@
 using namespace std;
 
 // Default constructor
-Humanoid::Humanoid() :
+Humanoid::Humanoid():
     Entity(),
     shootCooldown(0),
     shootTimer(100),
-    shootStyle(SS_SINGLESHOT)
+    shootStyle(SS_SINGLESHOT),
+    score(0)
 {
 }
 
@@ -22,7 +23,8 @@ Humanoid::Humanoid(const Humanoid &humanoid):
     Entity(humanoid),
     shootCooldown(100),
     shootTimer(humanoid.shootCooldown),
-    shootStyle(humanoid.shootStyle)
+    shootStyle(humanoid.shootStyle),
+    score(humanoid.score)
 {
 }
 
@@ -71,6 +73,26 @@ ShootStyle Humanoid::getShootStyle()
 void Humanoid::setShootStyle(ShootStyle ss)
 {
     shootStyle = ss;
+}
+
+/**
+ * Add to score
+ * 
+ * @param value Score amount to add
+ */
+void Humanoid::addScore(int value)
+{
+    score += value;
+}
+
+/**
+ * Getter for score
+ * 
+ * @returns The player's score
+ */
+int Humanoid::getScore(void)
+{
+    return score;
 }
 
 /**

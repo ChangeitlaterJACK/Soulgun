@@ -54,7 +54,7 @@ int main (int argc, char **argv) {
         if(player->damage(0)){
             SDL_RenderCopy(renderer, txMan->getTexture(TX_GAMEOVER), NULL, NULL);
             SDL_RenderPresent(renderer);
-            SDL_Delay(5000);
+            SDL_Delay(3000);
             break;
         }
 
@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
 
 		// Redraw entities on screen
 		dispMan.refreshEntities();
-		hud->refreshEntities();
+		hud->refresh();
 
 		SDL_RenderPresent(renderer);
 	}

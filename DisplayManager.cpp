@@ -454,13 +454,15 @@ void DisplayManager::moveProjectiles() {
                     if ((entities[i])->entityCollision(p->getHitbox()))
                     {
                         // If bullet hit a humanoid steal its soul
-                        if(swapSpots(entities[i])){
+                        if (swapSpots(entities[i])) {
                             entities.erase(entities.begin() + i);
+                            player->addScore(1);
                         }
-                        // bullet didnt hit a humanoid
+                        // bullet hit a robot
                         else if (entities[i]->damage(p->getPower()))
                         {
                             removeEntity(entities[i]);
+                            player->addScore(1);
                         }
                         removeProjectile(p);
                     }
@@ -571,9 +573,6 @@ void DisplayManager::refreshMap()
 			Position newPos = applyCameraOffset(tilePos);
 			rect.x = newPos.x;
 			rect.y = newPos.y;
-
-
-    printf("%d, %d\n", rect.x, rect.y);
 
 			SDL_RenderCopy(renderer, tile->getTileTexture(), NULL, &rect);
 		}

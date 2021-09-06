@@ -31,7 +31,7 @@ HUD::~HUD(void) {
 /**
  * Redaw player info and timer
  */
-void HUD::refreshEntities(void) {
+void HUD::refresh(void) {
     int lastX = 0;
 
     if (!isPaused) {
@@ -51,6 +51,9 @@ void HUD::refreshEntities(void) {
 
         lastX = renderText("Time: ", true, lastX + TEXT_GAP);
         lastX = renderText(time, false, lastX);
+
+        lastX = renderText("Score: ", true, lastX + TEXT_GAP);
+        lastX = renderText(std::to_string(player->getScore()), false, lastX);
 
         lastX = renderText("Health: ", true, lastX + TEXT_GAP);
         lastX = renderText(std::to_string(player->getHealth()), false, lastX);

@@ -52,9 +52,12 @@ public:
     std::vector<Projectile*> shoot(double targetx, double targety, bool soulBullet);
     ShootStyle getShootStyle();
     void setShootStyle(ShootStyle ss);
+    void addScore(int value);
+    int getScore(void);
 protected:
     int shootCooldown; // the current time left before being able to shoot again
     int shootTimer; // the time between each shot
     ShootStyle shootStyle; // what direction and how many projectiles to fire
+    int score;
 };
 #endif
