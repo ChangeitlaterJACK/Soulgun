@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
 
 		// Redraw entities on screen
 		dispMan.refreshEntities();
-		hud->refreshEntities();
+		hud->refresh();
 
 		SDL_RenderPresent(renderer);
 	}
