@@ -34,7 +34,7 @@ public:
 	MapTile(int x, int y, tileID id, SDL_Texture * texture );
 	void setTileData(int x, int y, int h, int w, tileID id);
 	tileID getType(void);
-	SDL_Rect* getTile(void);
+	SDL_Rect getRect(void);
 	SDL_Texture* getTileTexture(void);
 private:
 	tileID tID;
@@ -54,12 +54,12 @@ public:
 	~Map(void);
 	
 	void loadLevel(int level);
+	MapTile *getTile(int x, int y);
 	SDL_Texture* getTileTexture(int tile_type);
 	bool isPlayerColliding(Position player);
 
 	tileID textureToTile(int tile_type);
 	TextureID tileToTexture(int texture_type);
-	void refresh(SDL_Renderer * renderer); 
 private:
 	std::vector<SDL_Texture*> mapTextures;
 	std::vector<std::vector<MapTile*> > gameMap;

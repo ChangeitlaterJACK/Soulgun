@@ -74,9 +74,9 @@ tileID MapTile::getType(void)
 /**
  * Getter for tile attributes
  */
-SDL_Rect* MapTile::getTile(void)
+SDL_Rect MapTile::getRect(void)
 {
-	return &tileData;
+	return tileData;
 }
 
 /**
@@ -119,6 +119,17 @@ Map::Map(TextureManager * txMan)
 	}
 
 	loadLevel(1);
+}
+
+/**
+ * Retrieve MapTile
+ * 
+ * @param x x-coord
+ * @param y y-coord
+ * @returns Map Tile object
+ */
+MapTile *Map::getTile(int x, int y) {
+	return gameMap[x][y];
 }
 
 /**
@@ -252,24 +263,4 @@ TextureID Map::tileToTexture(int texture_type)
 		break;
 	}
 	return tid;
-}
-
-/**
- * Draws tiles onto the map
- * 
- * @param renderer External renderer
- */
-void Map::refresh(SDL_Renderer * renderer) 
-{
-	// TO-DO: Only render tiles that are visible
-	// Calculate camera offset position before SDL_RenderCopy
-
-	// Loops iterate over map 2D vector
-	for(int i = 0; i < MAX_TILES; ++i)
-	{
-		for(int j = 0; j < MAX_TILES; ++j)
-		{
-			SDL_RenderCopy(renderer, gameMap[i][j]->getTileTexture(), NULL, gameMap[i][j]->getTile());
-		}
-	}
 }

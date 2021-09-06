@@ -36,7 +36,7 @@ class HUD
 public:
     HUD(SDL_Renderer *renderer, Humanoid *player, TextureManager *txMan);
     ~HUD(void);
-    void refresh(void);
+    void refreshEntities(void);
 
     void startTimer(void);
     void stopTimer(void);

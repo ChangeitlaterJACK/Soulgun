@@ -63,7 +63,7 @@ int main (int argc, char **argv) {
 			player->move(movement);
 		}
 
-		// Wait for refresh delay
+		// Wait for refreshEntities delay
 		int now = SDL_GetTicks();
 		if (now < nextRefresh)
 			SDL_Delay(nextRefresh - now);
@@ -91,8 +91,8 @@ int main (int argc, char **argv) {
         }
 
 		// Redraw entities on screen
-		dispMan.refresh();
-		//hud->refresh();
+		dispMan.refreshEntities();
+		hud->refreshEntities();
 		SDL_RenderPresent(renderer);
 	}
 

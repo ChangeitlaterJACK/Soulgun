@@ -31,7 +31,7 @@ HUD::~HUD(void) {
 /**
  * Redaw player info and timer
  */
-void HUD::refresh(void) {
+void HUD::refreshEntities(void) {
     int lastX = 0;
 
     if (!isPaused) {

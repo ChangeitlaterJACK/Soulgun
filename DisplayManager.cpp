@@ -37,29 +37,28 @@ DisplayManager::~DisplayManager(void)
 }
 
 /**
- * Pan the camera as player moves
+ * Convert an absolute position on the map to a position relative to what is being rendered on the window
  * 
- * @param window_focus The coordinates that the camera is focusing on
- * @param absPos Absolute position
+ * @param absPos Absolute position on map
  * @returns Position relative to window and focal point
  */
-Position DisplayManager::getCameraOffset(Position window_focus, Position absPos)
+Position DisplayManager::applyCameraOffset(Position absPos)
 {
     Position offset = { 0, 0 };
     Position result = { 0, 0 };
 
-    // Focal point will be in center of window
-    int winX = WINDOW_WIDTH / 2;
-    int winY = WINDOW_HEIGHT / 2;
+    // Focal point will be the player in the center of the window
+    Position window_focus = player->getPosition();
+    double winX = WINDOW_WIDTH / 2;
+    double winY = WINDOW_HEIGHT / 2;
 
-    // Calculate offset relative to focal point
-    if (window_focus.x >= winX && window_focus.x <= MAX_TILES * TILE_WIDTH - winX)
+    // Calculate offset relative to focal point, unless too close to edge of map
+    if (window_focus.x >= winX)
         offset.x = winX - window_focus.x;
-
-    if (window_focus.y >= winY && window_focus.y <= MAX_TILES * TILE_HEIGHT - winY)
+    if (window_focus.y >= winY)
         offset.y = winY - window_focus.y;
 
-    // Modify position
+    // Apply offset
     result.x = absPos.x + offset.x;
     result.y = absPos.y + offset.y;
 
@@ -480,7 +479,7 @@ void DisplayManager::moveProjectiles() {
 /**
  * Draws textures on the window where they are currently located
  */
-void DisplayManager::refresh(void) {
+void DisplayManager::refreshEntities(void) {
     // Put textures on screen
     SDL_Rect position;
     SDL_Point size;
@@ -489,7 +488,7 @@ void DisplayManager::refresh(void) {
     Projectile *p;
 
     // Render map
-	renderMap->refresh(renderer);
+	refreshMap();
 
     // Render entities
     for (int i = 0; i < entities.size(); ++i) {
@@ -500,7 +499,7 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        Position pos = getCameraOffset(player->getPosition(), e->getPosition());
+        Position pos = applyCameraOffset(e->getPosition());
         position.x  = pos.x;
         position.y  = pos.y;
 
@@ -516,12 +515,69 @@ void DisplayManager::refresh(void) {
         position.h = size.y;
         position.w = size.x;
 
-        Position pos = getCameraOffset(player->getPosition(), p->getPosition());
+        Position pos = applyCameraOffset(p->getPosition());
         position.x  = pos.x;
         position.y  = pos.y;
 
         SDL_RenderCopy(renderer, texture, NULL, &position);
     }
+}
+
+/**
+ * Draws tiles onto the map
+ */
+void DisplayManager::refreshMap() 
+{
+    Position pos = player->getPosition();
+    int tilesX = WINDOW_WIDTH / TILE_WIDTH; // Total horizontal tiles per window
+    int tilesY = WINDOW_HEIGHT / TILE_HEIGHT; // Total vertical tiles per window
+
+    // To-Do: This index math could probably be streamlined
+    // Determine which tile indices to start and end drawing
+    int startX = (pos.x - (WINDOW_WIDTH / 2)) / TILE_WIDTH;
+    int startY = (pos.y - (WINDOW_HEIGHT / 2)) / TILE_HEIGHT;
+    
+    int endX = (pos.x + (WINDOW_WIDTH / 2)) / TILE_WIDTH;
+    int endY = (pos.y + (WINDOW_HEIGHT / 2)) / TILE_HEIGHT;
+    ++endX;
+    ++endY;
+
+    // If player is close to edge of map, make indices fill out the window
+    if (endX < tilesX) endX = tilesX + 1;
+    if (endY < tilesY) endY = tilesY + 1;
+
+    int tileGapX = endX - startX;
+    int tileGapY = endY - startY;
+
+    if (tileGapX < tilesX) startX = endX - tilesX;
+    if (tileGapY < tilesY) startY = endY - tilesY;
+    
+    // Enforce max index bounds
+    if (startX < 0) startX = 0;
+    if (startY < 0) startY = 0;
+
+    if (endX > MAX_TILES) endX = MAX_TILES;
+    if (endY > MAX_TILES) endY = MAX_TILES;
+    
+	// Loops iterate over map 2D vector
+	for (int i = startY; i < endY; ++i)
+	{
+		for (int j = startX; j < endX; ++j)
+		{
+            MapTile *tile = renderMap->getTile(i, j);
+			SDL_Rect rect = tile->getRect();
+            
+			Position tilePos = { rect.x, rect.y };
+			Position newPos = applyCameraOffset(tilePos);
+			rect.x = newPos.x;
+			rect.y = newPos.y;
+
+
+    printf("%d, %d\n", rect.x, rect.y);
+
+			SDL_RenderCopy(renderer, tile->getTileTexture(), NULL, &rect);
+		}
+	}
 }
 
 /**
